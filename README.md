@@ -1,5 +1,9 @@
 # redux-snake
 
+## description
+
+A Redux-React implementation of the "Nokia Snake" game.
+
 ## install & build
 
 - npm install
