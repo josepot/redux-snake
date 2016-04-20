@@ -1,4 +1,3 @@
-import R from 'ramda';
 import { NEW_GAME, FOOD_EATEN } from '../actions';
 import { ROWS, COLS } from '../config';
 import { initialHead } from './head.js';
@@ -6,13 +5,14 @@ import { positionToIndex, indexToPosition } from '../utils';
 
 const getRandomInt = (limit) => Math.floor(Math.random() * limit);
 const getFoodPosition = (snakePositions) => {
-  const sortedSnakePositions = R.sort(R.gt, snakePositions.map(positionToIndex));
+  const sortedSnakePositions =
+    snakePositions.map(positionToIndex).sort((a, b) => a - b);
   const nAvailablePositions = (ROWS * COLS) - sortedSnakePositions.length;
-  let winner = getRandomInt(nAvailablePositions);
-  for (let i = 0; sortedSnakePositions[i] <= winner; i++) {
-    winner++;
-  }
-  return indexToPosition(winner);
+  const winner = getRandomInt(nAvailablePositions);
+  return indexToPosition(sortedSnakePositions.reduce(
+    (result, index) => (result >= index ? result + 1 : result),
+    winner
+  ));
 };
 
 const initialState = getFoodPosition([initialHead]);
