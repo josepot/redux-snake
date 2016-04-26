@@ -1,4 +1,5 @@
-import { TICK_FREQUENCY } from '../config';
+import { Margins } from '../components/margins.js';
+import { TICK_FREQUENCY, ROWS, COLS, MARGIN } from '../config';
 import { PLAYING, PAUSED, ENDED, READY } from '../reducers/game-status.js';
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
@@ -52,17 +53,28 @@ class App extends Component {
   }
 
   render() {
-    const { radius, frame, port, food, width, height, snakePoints } = this.props;
+    const { food, width, height, snakeKeyPositions } = this.props;
+    const viewbox = {
+      x: 0 - MARGIN.LEFT - 0.5,
+      y: 0 - MARGIN.TOP - 0.5,
+      width: COLS + MARGIN.LEFT + MARGIN.RIGHT,
+      height: ROWS + MARGIN.TOP + MARGIN.BOTTOM,
+    };
+    const viewboxStr = `${viewbox.x} ${viewbox.y} ${viewbox.width} ${viewbox.height}`;
+
+    const snake = snakeKeyPositions.unshift(snakeKeyPositions.first()).map(
+      pos => `${pos.x} ${pos.y}`
+    ).join(' ');
 
     return (
-      <svg width={width} height={height}>
-      <rect x={frame.x} y={frame.y} width={frame.width} height={frame.height} fill="#CBC3BA" />
-      <rect x={port.x} y={port.y} width={port.width} height={port.height} fill="#9BB07B" />
+      <svg width={width} height={height} viewBox={viewboxStr}>
+      <Margins viewbox={viewbox} />
+      <rect x={-0.5} y={-0.5} width={COLS} height={ROWS} fill="#9BB07B" />
       <polyline
-        points={snakePoints} style={{ fill: 'none', stroke: '#3E462F' }}
-        strokeWidth={radius * 2} strokeLinecap={'square'}
+        points={snake} style={{ fill: 'none', stroke: '#3E462F' }}
+        strokeWidth={1} strokeLinecap={'square'}
       />
-      <circle cx={food.x} cy={food.y} r={radius} fill="#3E462F" />
+      <circle cx={food.x} cy={food.y} r={0.5} fill="#3E462F" />
       </svg>
     );
   }
@@ -71,13 +83,10 @@ class App extends Component {
 App.propTypes = {
   gameStatus: PropTypes.string.isRequired,
   tick: PropTypes.number.isRequired,
-  radius: PropTypes.number.isRequired,
-  frame: PropTypes.object.isRequired,
-  port: PropTypes.object.isRequired,
   food: PropTypes.object.isRequired,
+  snakeKeyPositions: PropTypes.object.isRequired,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
-  snakePoints: PropTypes.string.isRequired,
   dispatch: PropTypes.func.isRequired,
 };
 

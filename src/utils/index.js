@@ -52,8 +52,3 @@ export const didHeadHitBody = (head, keyPositions, lastDirection) =>
     return head[constant] === current[constant] &&
       isNumberBetween(head[variable], current[variable], next[variable]);
   });
-
-export const getGamePosition = (position, padLeft, padTop, radius) => ({
-  x: (position.x * radius * 2) + radius + padLeft,
-  y: (position.y * radius * 2) + radius + padTop,
-});

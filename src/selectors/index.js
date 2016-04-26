@@ -2,7 +2,7 @@ import R from 'ramda';
 import { List } from 'immutable';
 import { createSelector } from 'reselect';
 import { OPPOSITE_DIRECTIONS } from '../reducers/directions.js';
-import { getNextPosition, didHeadHitBody, getGamePosition } from '../utils';
+import { getNextPosition, didHeadHitBody } from '../utils';
 import { COLS, ROWS, MARGIN } from '../config';
 
 const GAME_WIDTH = (COLS + MARGIN.LEFT + MARGIN.RIGHT);
@@ -111,82 +111,30 @@ export const didSnakeCrash = createSelector(
     || y >= ROWS || didHeadHitBody({ x, y }, keyPositions, direction)
 );
 
-const getWindowProportions = createSelector(
+const getWidthHeight = createSelector(
   [getDimensions],
-  ({ width, height }) => width / height
-);
-
-const getGameRadius = createSelector(
-  [getDimensions, getWindowProportions],
-  ({ width, height }, windowProportions) => (
-    GAME_PROPORTIONS > windowProportions ?
-      width / GAME_WIDTH :
-      height / GAME_HEIGHT
-  ) / 2
-);
-
-const getPaddingLeft = createSelector(
-  [getDimensions, getWindowProportions, getGameRadius],
-  ({ width }, windowProportions, radius) => (
-    GAME_PROPORTIONS > windowProportions ?
-      0 :
-      (width - (radius * 2 * GAME_WIDTH)) / 2
-  )
-);
-
-const getGameFrame = createSelector(
-  [getPaddingLeft, getGameRadius],
-  (paddingLeft, radius) => ({
-    x: paddingLeft,
-    y: 0,
-    width: GAME_WIDTH * radius * 2,
-    height: GAME_HEIGHT * radius * 2,
-  })
-);
-
-const getGameport = createSelector(
-  [getPaddingLeft, getGameRadius],
-  (paddingLeft, radius) => ({
-    x: paddingLeft + (radius * 2 * MARGIN.LEFT),
-    y: radius * MARGIN.TOP * 2,
-    width: radius * COLS * 2,
-    height: radius * ROWS * 2,
-  })
-);
-
-
-const getGameFoodPosition = createSelector(
-  [getGameport, getGameRadius, getFood],
-  ({ x, y }, radius, food) => getGamePosition(food, x, y, radius)
-);
-
-const getGameSnakePositions = createSelector(
-  [getSnakeKeyPositions, getGameport, getGameRadius],
-  (snake, { x, y }, radius) => {
-    const finalSnake = snake.size === 1 ?
-      List.of(snake.first(), snake.first()) :
-      snake
-    ;
-    return finalSnake.map(position => getGamePosition(
-      position, x, y, radius
-    ));
+  ({ width, height }) => {
+    const windowProportions = width / height;
+    return windowProportions > GAME_PROPORTIONS ? {
+      width: height * GAME_PROPORTIONS,
+      height,
+    } : {
+      width,
+      height: width / GAME_PROPORTIONS,
+    };
   }
 );
 
 export const ui = createSelector(
   [
-    getGameStatus, getTick, getGameRadius, getGameFrame, getGameport,
-    getGameFoodPosition, getDimensions, getGameSnakePositions,
+    getGameStatus, getTick, getFood, getSnakeKeyPositions, getWidthHeight,
   ],
-  (gameStatus, tick, radius, frame, port, food, { width, height }, snake) => ({
+  (gameStatus, tick, food, snakeKeyPositions, { width, height }) => ({
     gameStatus,
     tick,
-    radius,
-    frame,
-    port,
     food,
+    snakeKeyPositions,
     width,
     height,
-    snakePoints: snake.map(pos => `${pos.x},${pos.y}`).join(' '),
   })
 );
