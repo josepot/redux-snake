@@ -107,8 +107,8 @@ export const getAllSnakePositions =
 
 export const didSnakeCrash = createSelector(
   [getHead, getSnakeKeyPositions, getLastDirection],
-  ({ x, y }, keyPositions, lastDirection) => x < 0 || y < 0 || x >= COLS
-    || y >= ROWS || didHeadHitBody({ x, y }, keyPositions, lastDirection)
+  ({ x, y }, keyPositions, { direction }) => x < 0 || y < 0 || x >= COLS
+    || y >= ROWS || didHeadHitBody({ x, y }, keyPositions, direction)
 );
 
 const getWindowProportions = createSelector(
