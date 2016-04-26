@@ -19,21 +19,6 @@ const getFood = R.path(['food']);
 
 const getMinimumTick = createSelector([getTick, getSnakeLength], R.subtract);
 
-export const getLastDirection = createSelector(
-  [getDirections, getTick],
-  (directions, currentTick) => directions.skipWhile(
-    ({ tick }) => tick >= currentTick
-  ).first()
-);
-
-export const getNextDirection = createSelector(
-  [getDirections, getTick],
-  (directions, currentTick) => {
-    const nextDirections = directions.takeWhile(({ tick }) => tick >= currentTick);
-    return nextDirections.size > 0 ? nextDirections.last() : directions.first();
-  }
-);
-
 /*
  *  In a case like the following, where the snake is moving towards the left:
  *
@@ -106,9 +91,9 @@ export const getAllSnakePositions =
   createSelector([getSnakeVectors, getHead], _getAllSnakePositions);
 
 export const didSnakeCrash = createSelector(
-  [getHead, getSnakeKeyPositions, getLastDirection],
-  ({ x, y }, keyPositions, { direction }) => x < 0 || y < 0 || x >= COLS
-    || y >= ROWS || didHeadHitBody({ x, y }, keyPositions, direction)
+  [getHead, getSnakeKeyPositions],
+  ({ x, y }, keyPositions) => x < 0 || y < 0 || x >= COLS
+    || y >= ROWS || didHeadHitBody({ x, y }, keyPositions)
 );
 
 const getWidthHeight = createSelector(
@@ -137,4 +122,12 @@ export const ui = createSelector(
     width,
     height,
   })
+);
+
+export const getCurrentDirection = createSelector(
+  [getDirections, getTick],
+  (directions, currentTick) => {
+    const nextDirections = directions.takeWhile(({ tick }) => tick >= currentTick);
+    return nextDirections.size > 0 ? nextDirections.last() : directions.first();
+  }
 );

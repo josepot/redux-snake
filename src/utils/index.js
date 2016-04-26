@@ -1,6 +1,5 @@
 import R from 'ramda';
 import { COLS, ROWS } from '../config';
-import { LEFT, RIGHT } from '../reducers/directions.js';
 
 export const positionToIndex = (position) => (position.y * COLS) + position.x;
 export const indexToPosition = (index) => ({
@@ -30,25 +29,17 @@ export const getNextPosition = (position, direction, increment = 1) => R.evolve(
 );
 
 const isNumberBetween = (testNumber, a, b) => {
-  const lowerEnd = R.min(a, b);
-  const higherEnd = R.max(a, b);
-  return testNumber >= lowerEnd && testNumber <= higherEnd;
+  const { min, max } = a < b ? { min: a, max: b } : { min: b, max: a };
+  return testNumber >= min && testNumber <= max;
 };
 
-const getRelevantProperties = (lastDirection, idx) => {
-  const horizontal = { constant: 'y', variable: 'x' };
-  const vertical = { constant: 'x', variable: 'y' };
-  const { first, second } = [LEFT, RIGHT].includes(lastDirection) ?
-    { first: vertical, second: horizontal } :
-    { first: horizontal, second: vertical };
-  return idx % 2 === 0 ? first : second;
-};
-
-export const didHeadHitBody = (head, keyPositions, lastDirection) =>
+export const didHeadHitBody = (head, keyPositions) =>
   keyPositions.skip(3).some((current, idx, items) => {
     const next = items.get(idx + 1);
     if (next === undefined) return false;
-    const { constant, variable } = getRelevantProperties(lastDirection, idx);
+    const { constant, variable } = current.x === next.x ?
+      { constant: 'x', variable: 'y' } : { constant: 'y', variable: 'x' };
+
     return head[constant] === current[constant] &&
       isNumberBetween(head[variable], current[variable], next[variable]);
   });

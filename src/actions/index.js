@@ -1,5 +1,5 @@
 import R from 'ramda';
-import { didSnakeCrash, getAllSnakePositions, getNextDirection } from '../selectors';
+import { didSnakeCrash, getAllSnakePositions, getCurrentDirection } from '../selectors';
 
 export const NEW_GAME = 'NEW_GAME';
 export const NEW_DIRECTION = 'NEW_DIRECTION';
@@ -32,7 +32,7 @@ export function newDirection(direction, tickNumber) {
 
 export function tick() {
   return (dispatch, getState) => {
-    const { direction } = getNextDirection(getState());
+    const { direction } = getCurrentDirection(getState());
     dispatch({ type: TICK, direction });
 
     const { head, food } = getState();
