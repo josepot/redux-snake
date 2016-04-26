@@ -62,16 +62,17 @@ class App extends Component {
     };
     const viewboxStr = `${viewbox.x} ${viewbox.y} ${viewbox.width} ${viewbox.height}`;
 
-    const snake = snakeKeyPositions.unshift(snakeKeyPositions.first()).map(
-      pos => `${pos.x} ${pos.y}`
-    ).join(' ');
+    const snakePoints = (snakeKeyPositions.size > 1 ?
+      snakeKeyPositions :
+      snakeKeyPositions.unshift(snakeKeyPositions.first())
+    ).map(pos => `${pos.x} ${pos.y}`).join(' ');
 
     return (
       <svg width={width} height={height} viewBox={viewboxStr}>
       <Margins viewbox={viewbox} />
       <rect x={-0.5} y={-0.5} width={COLS} height={ROWS} fill="#9BB07B" />
       <polyline
-        points={snake} style={{ fill: 'none', stroke: '#3E462F' }}
+        points={snakePoints} style={{ fill: 'none', stroke: '#3E462F' }}
         strokeWidth={1} strokeLinecap={'square'}
       />
       <circle cx={food.x} cy={food.y} r={0.5} fill="#3E462F" />
