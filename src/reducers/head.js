@@ -1,6 +1,6 @@
 import { COLS, ROWS } from '../config.js';
 import { NEW_GAME, TICK, COLLISION } from '../actions.js';
-import { evolvePosition } from '../utils.js';
+import evolvePosition from '../evolve-position.js';
 
 export const initialHead = {
   x: Math.trunc(COLS / 2),

@@ -1,9 +1,14 @@
 import { NEW_GAME, FOOD_EATEN } from '../actions.js';
 import { ROWS, COLS } from '../config.js';
 import { initialHead } from './head.js';
-import { positionToIndex, indexToPosition } from '../utils.js';
+
+const positionToIndex = (position) => (position.y * COLS) + position.x;
+
+const indexToPosition =
+  (index) => ({ y: Math.trunc(index / COLS), x: index % COLS });
 
 const getRandomInt = (limit) => Math.floor(Math.random() * limit);
+
 const getFoodPosition = (snakePositions) => {
   const sortedSnakePositions =
     snakePositions.map(positionToIndex).sort((a, b) => a - b);
