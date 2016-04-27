@@ -11,7 +11,7 @@ A Redux-React implementation of the "Nokia Snake" game.
 
 ## instructions
 
-- Open `index.html`
+- Open `./assets/index.html`
 - Press one of the arrow buttons to start playing
 - Press space to pause/resume
 - If you crash press space to start a new game

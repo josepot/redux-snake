@@ -1,5 +1,5 @@
 import R from 'ramda';
-import { didSnakeCrash, getAllSnakePositions, getCurrentDirection } from '../selectors';
+import { didSnakeCrash, getAllSnakePositions, getCurrentDirection } from './selectors.js';
 
 export const NEW_GAME = 'NEW_GAME';
 export const NEW_DIRECTION = 'NEW_DIRECTION';

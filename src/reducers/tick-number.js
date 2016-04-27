@@ -1,5 +1,5 @@
 import R from 'ramda';
-import { NEW_GAME, TICK } from '../actions';
+import { NEW_GAME, TICK } from '../actions.js';
 
 export const initialState = 0;
 

@@ -1,8 +1,8 @@
 import assert from 'assert';
-import foodReducer from './food.js';
 import R from 'ramda';
-import { ROWS, COLS } from '../config';
-import { positionToIndex, indexToPosition } from '../utils';
+import foodReducer from '../../src/reducers/food.js';
+import { ROWS, COLS } from '../../src/config.js';
+import { positionToIndex } from '../../src/utils.js';
 
 let fakeRandomNumber;
 foodReducer.__Rewire__('getRandomInt', () => fakeRandomNumber);

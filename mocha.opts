@@ -1,3 +1,2 @@
 --compilers js:babel-register
--x ./**/*.test.js
-./src/**/*.test.js
+./tests/**/*.js

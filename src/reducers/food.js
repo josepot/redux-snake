@@ -1,7 +1,7 @@
-import { NEW_GAME, FOOD_EATEN } from '../actions';
-import { ROWS, COLS } from '../config';
+import { NEW_GAME, FOOD_EATEN } from '../actions.js';
+import { ROWS, COLS } from '../config.js';
 import { initialHead } from './head.js';
-import { positionToIndex, indexToPosition } from '../utils';
+import { positionToIndex, indexToPosition } from '../utils.js';
 
 const getRandomInt = (limit) => Math.floor(Math.random() * limit);
 const getFoodPosition = (snakePositions) => {

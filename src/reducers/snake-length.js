@@ -1,6 +1,6 @@
 import R from 'ramda';
-import { GROWTH_FACTOR } from '../config';
-import { NEW_GAME, TICK, FOOD_EATEN } from '../actions';
+import { GROWTH_FACTOR } from '../config.js';
+import { NEW_GAME, TICK, FOOD_EATEN } from '../actions.js';
 
 const initialState = {
   current: 0,

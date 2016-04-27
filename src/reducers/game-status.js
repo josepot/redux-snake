@@ -1,4 +1,4 @@
-import { NEW_GAME, PAUSE, RESUME, NEW_DIRECTION, COLLISION } from '../actions';
+import { NEW_GAME, PAUSE, RESUME, NEW_DIRECTION, COLLISION } from '../actions.js';
 
 export const READY = 'READY';
 export const PLAYING = 'PLAYING';

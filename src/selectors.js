@@ -1,9 +1,9 @@
 import R from 'ramda';
 import { List } from 'immutable';
 import { createSelector } from 'reselect';
-import { OPPOSITE_DIRECTIONS } from '../reducers/directions.js';
-import { getNextPosition, didHeadHitBody } from '../utils';
-import { COLS, ROWS, MARGIN } from '../config';
+import { OPPOSITE_DIRECTIONS } from './reducers/directions.js';
+import { getNextPosition, isNumberBetween } from './utils.js';
+import { COLS, ROWS, MARGIN } from './config.js';
 
 const GAME_WIDTH = (COLS + MARGIN.LEFT + MARGIN.RIGHT);
 const GAME_HEIGHT = (ROWS + MARGIN.TOP + MARGIN.BOTTOM);
@@ -19,26 +19,6 @@ const getFood = R.path(['food']);
 
 const getMinimumTick = createSelector([getTick, getSnakeLength], R.subtract);
 
-/*
- *  In a case like the following, where the snake is moving towards the left:
- *
- *    0 1 2 3 4 5
- *    _ _ _ _ _ _
- * 0 | | | | | | |
- * 1 | |x|x|x| | |
- * 2 | | | |x| | |
- * 3 | | | |x| | |
- * 4 | | | |x|x|x|
- * 5 | | | | | | |
- *    ‾ ‾ ‾ ‾ ‾ ‾
- *  It should return: [
- *    { direction: 'LEFT', len: 2 },
- *    { direction: 'UP', len: 3 },
- *    { direction: 'LEFT', len: 2 },
- *  ]
- *  Notice that the sum of the len of the vectors will always be one unit less
- *  than the body length. This is because the vectors are from the head of the snake.
- * */
 const _getSnakeVectors =
   (latestTick, directions, minTick) => directions.skipUntil(
     ({ tick }) => tick < latestTick
@@ -53,48 +33,12 @@ const _getSnakeVectors =
 export const getSnakeVectors =
   createSelector([getTick, getDirections, getMinimumTick], _getSnakeVectors);
 
-/*
- *  In a case like this:
- *
- *  x 0 1 2 3 4 5
- * y  _ _ _ _ _ _
- * 0 | | | | | | |
- * 1 | |x|x|x| | |
- * 2 | | | |x| | |
- * 3 | | | |x| | |
- * 4 | | | |x|x|x|
- * 5 | | | | | | |
- *    ‾ ‾ ‾ ‾ ‾ ‾
- *  It should return: [
- *    { x: 1, y: 1 },
- *    { x: 3, y: 1 },
- *    { x: 3, y: 4 },
- *    { x: 5, y: 4 }
- *  ]
- * */
 const _getSnakeKeyPositions =
   (vectors, head) => vectors.reduce((prev, cur) => prev.push(getNextPosition(
     prev.last(), OPPOSITE_DIRECTIONS[cur.direction], cur.len
   )), List.of(head));
-
 export const getSnakeKeyPositions =
   createSelector([getSnakeVectors, getHead], _getSnakeKeyPositions);
-
-const _getAllSnakePositions =
-  (vectors, head) => vectors.reduce((prev, { len, direction }) => prev.concat(
-    ...R.range(0, len).map((inc) => getNextPosition(
-      R.last(prev), OPPOSITE_DIRECTIONS[direction], inc + 1
-    ))
-  ), [head]);
-
-export const getAllSnakePositions =
-  createSelector([getSnakeVectors, getHead], _getAllSnakePositions);
-
-export const didSnakeCrash = createSelector(
-  [getHead, getSnakeKeyPositions],
-  ({ x, y }, keyPositions) => x < 0 || y < 0 || x >= COLS
-    || y >= ROWS || didHeadHitBody({ x, y }, keyPositions)
-);
 
 const getWidthHeight = createSelector(
   [getDimensions],
@@ -124,10 +68,36 @@ export const ui = createSelector(
   })
 );
 
+const _getAllSnakePositions =
+  (vectors, head) => vectors.reduce((prev, { len, direction }) => prev.concat(
+    ...R.range(0, len).map((inc) => getNextPosition(
+      R.last(prev), OPPOSITE_DIRECTIONS[direction], inc + 1
+    ))
+  ), [head]);
+export const getAllSnakePositions =
+  createSelector([getSnakeVectors, getHead], _getAllSnakePositions);
+
+const isHeadOutBounds = ({ x, y }) => x < 0 || y < 0 || x >= COLS || y >= ROWS;
+
+const didHeadHitBody = (head, keyPositions) =>
+  keyPositions.skip(3).some((current, idx, items) => {
+    const next = items.get(idx + 1);
+    if (next === undefined) return false;
+    const { constProp, varProp } = current.x === next.x ?
+      { constProp: 'x', varProp: 'y' } : { constProp: 'y', varProp: 'x' };
+
+    return head[constProp] === current[constProp] &&
+      isNumberBetween(head[varProp], current[varProp], next[varProp]);
+  });
+
+export const didSnakeCrash = createSelector(
+  [getHead, getSnakeKeyPositions], R.either(isHeadOutBounds, didHeadHitBody)
+);
+
 export const getCurrentDirection = createSelector(
   [getDirections, getTick],
   (directions, currentTick) => {
-    const nextDirections = directions.takeWhile(({ tick }) => tick >= currentTick);
-    return nextDirections.size > 0 ? nextDirections.last() : directions.first();
+    const unprocessed = directions.takeWhile(({ tick }) => tick >= currentTick);
+    return unprocessed.size > 0 ? unprocessed.last() : directions.first();
   }
 );

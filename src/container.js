@@ -1,13 +1,20 @@
-import { Margins } from '../components/margins.js';
-import { TICK_FREQUENCY, ROWS, COLS, MARGIN } from '../config';
-import { PLAYING, PAUSED, ENDED, READY } from '../reducers/game-status.js';
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { ui } from '../selectors';
-import { tick, resize, newDirection, pause, resume, newGame } from '../actions';
-import { KEYBOARD_DIRECTIONS, KEYBOARD_KEYS } from '../constants';
+import { Margins } from './components/margins.js';
+import { TICK_FREQUENCY, ROWS, COLS, MARGIN } from './config.js';
+import { PLAYING, PAUSED, ENDED, READY } from './reducers/game-status.js';
+import { ui } from './selectors.js';
+import { tick, resize, newDirection, pause, resume, newGame } from './actions.js';
 
-class App extends Component {
+const KEYBOARD_DIRECTIONS = {
+  37: 'LEFT',
+  38: 'UP',
+  39: 'RIGHT',
+  40: 'DOWN',
+};
+const SPACE_KEY_CODE = 32;
+
+export class App extends Component {
   constructor(props) {
     super(props);
     const { dispatch } = this.props;
@@ -28,7 +35,7 @@ class App extends Component {
       const direction = KEYBOARD_DIRECTIONS[key];
       if (direction && [PLAYING, READY].includes(me.props.gameStatus)) {
         dispatch(newDirection(direction, me.props.tick));
-      } else if (key === KEYBOARD_KEYS.SPACE) {
+      } else if (key === SPACE_KEY_CODE) {
         switch (me.props.gameStatus) {
           case PLAYING:
             dispatch(pause());

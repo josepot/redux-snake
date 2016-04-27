@@ -8,11 +8,5 @@ import snakeLength from './snake-length.js';
 import tickNumber from './tick-number.js';
 
 export default combineReducers({
-  dimensions,
-  directions,
-  food,
-  gameStatus,
-  head,
-  snakeLength,
-  tickNumber,
+  dimensions, directions, food, gameStatus, head, snakeLength, tickNumber,
 });

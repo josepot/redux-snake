@@ -1,5 +1,5 @@
 import { List } from 'immutable';
-import { NEW_GAME, NEW_DIRECTION } from '../actions';
+import { NEW_GAME, NEW_DIRECTION } from '../actions.js';
 
 export const { UP, DOWN, RIGHT, LEFT } = {
   UP: 'UP',

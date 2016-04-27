@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { COLS, ROWS, MARGIN } from '../config';
+import { COLS, ROWS, MARGIN } from '../config.js';
 
 export const Margins = (props) => {
   const { viewbox } = props;
