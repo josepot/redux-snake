@@ -2,8 +2,8 @@ import R from 'ramda';
 import { List } from 'immutable';
 import { createSelector } from 'reselect';
 import { OPPOSITE_DIRECTIONS } from './reducers/directions.js';
-import { getNextPosition, isNumberBetween } from './utils.js';
-import { COLS, ROWS, MARGIN } from './config.js';
+import { evolvePosition, isNumberBetween } from './utils.js';
+import { COLS, ROWS, MARGIN, GROWTH_FACTOR } from './config.js';
 
 const GAME_WIDTH = (COLS + MARGIN.LEFT + MARGIN.RIGHT);
 const GAME_HEIGHT = (ROWS + MARGIN.TOP + MARGIN.BOTTOM);
@@ -12,12 +12,24 @@ const GAME_PROPORTIONS = GAME_WIDTH / GAME_HEIGHT;
 const getDirections = R.path(['directions']);
 const getTick = R.path(['tickNumber']);
 const getGameStatus = R.path(['gameStatus']);
-const getSnakeLength = R.path(['snakeLength', 'current']);
+const getCollectedFood = R.path(['collectedFood']);
 const getHead = R.path(['head']);
 const getDimensions = R.path(['dimensions']);
 const getFood = R.path(['food']);
 
-const getMinimumTick = createSelector([getTick, getSnakeLength], R.subtract);
+export const getCurrentBodyLengthBuffer = createSelector(
+  [getCollectedFood, getTick],
+  (eaten, tick) => (eaten.size === 0 ? 0 :
+    eaten.last().buffer + R.max(0, GROWTH_FACTOR - (tick - eaten.last().tick))
+  )
+);
+
+const getBodyLength = createSelector(
+  [getCollectedFood, getCurrentBodyLengthBuffer],
+  (eaten, buffer) => (eaten.size * GROWTH_FACTOR) - buffer
+);
+
+const getMinimumTick = createSelector([getTick, getBodyLength], R.subtract);
 
 const _getSnakeVectors =
   (latestTick, directions, minTick) => directions.skipUntil(
@@ -34,7 +46,7 @@ export const getSnakeVectors =
   createSelector([getTick, getDirections, getMinimumTick], _getSnakeVectors);
 
 const _getSnakeKeyPositions =
-  (vectors, head) => vectors.reduce((prev, cur) => prev.push(getNextPosition(
+  (vectors, head) => vectors.reduce((prev, cur) => prev.push(evolvePosition(
     prev.last(), OPPOSITE_DIRECTIONS[cur.direction], cur.len
   )), List.of(head));
 export const getSnakeKeyPositions =
@@ -70,7 +82,7 @@ export const ui = createSelector(
 
 const _getAllSnakePositions =
   (vectors, head) => vectors.reduce((prev, { len, direction }) => prev.concat(
-    ...R.range(0, len).map((inc) => getNextPosition(
+    ...R.range(0, len).map((inc) => evolvePosition(
       R.last(prev), OPPOSITE_DIRECTIONS[direction], inc + 1
     ))
   ), [head]);

@@ -19,7 +19,7 @@ const getMovementTransformation = (direction, increment) => {
   return movements[direction];
 };
 
-export const getNextPosition = (position, direction, increment = 1) => R.evolve(
+export const evolvePosition = (position, direction, increment = 1) => R.evolve(
   getMovementTransformation(direction, increment),
   position
 );
