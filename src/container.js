@@ -18,25 +18,25 @@ export class App extends Component {
   constructor(props) {
     super(props);
     const { dispatch } = this.props;
-    const me = this;
 
     this.nextTick = () => {
-      if (me.props.gameStatus === PLAYING) {
+      if (this.props.gameStatus === PLAYING) {
         dispatch(tick());
       }
     };
 
-    this.upateDimensions = () => {
+    this.updateDimensions = () => {
       dispatch(resize(window.innerWidth, window.innerHeight));
     };
 
     this.pressKey = (e) => {
       const key = e.keyCode || e.which;
       const direction = KEYBOARD_DIRECTIONS[key];
-      if (direction && [PLAYING, READY].includes(me.props.gameStatus)) {
-        dispatch(newDirection(direction, me.props.tick));
+
+      if (direction && [PLAYING, READY].includes(this.props.gameStatus)) {
+        dispatch(newDirection(direction, this.props.tickNumber));
       } else if (key === SPACE_KEY_CODE) {
-        switch (me.props.gameStatus) {
+        switch (this.props.gameStatus) {
           case PLAYING:
             dispatch(pause());
             break;
@@ -53,8 +53,8 @@ export class App extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(resize(window.innerWidth, window.innerHeight));
-    window.addEventListener('resize', this.upateDimensions);
+    this.updateDimensions();
+    window.addEventListener('resize', this.updateDimensions);
     window.setInterval(this.nextTick, TICK_FREQUENCY);
     document.addEventListener('keydown', this.pressKey, true);
   }
@@ -76,13 +76,13 @@ export class App extends Component {
 
     return (
       <svg width={width} height={height} viewBox={viewboxStr}>
-      <Margins viewbox={viewbox} />
-      <rect x={-0.5} y={-0.5} width={COLS} height={ROWS} fill="#9BB07B" />
-      <polyline
-        points={snakePoints} style={{ fill: 'none', stroke: '#3E462F' }}
-        strokeWidth={1} strokeLinecap={'square'}
-      />
-      <circle cx={food.x} cy={food.y} r={0.5} fill="#3E462F" />
+        <Margins viewbox={viewbox} />
+        <rect x={-0.5} y={-0.5} width={COLS} height={ROWS} fill="#9BB07B" />
+        <polyline
+          points={snakePoints} style={{ fill: 'none', stroke: '#3E462F' }}
+          strokeWidth={1} strokeLinecap={'square'}
+        />
+        <circle cx={food.x} cy={food.y} r={0.5} fill="#3E462F" />
       </svg>
     );
   }
@@ -90,7 +90,7 @@ export class App extends Component {
 
 App.propTypes = {
   gameStatus: PropTypes.string.isRequired,
-  tick: PropTypes.number.isRequired,
+  tickNumber: PropTypes.number.isRequired,
   food: PropTypes.object.isRequired,
   snakeKeyPositions: PropTypes.object.isRequired,
   width: PropTypes.number.isRequired,

@@ -70,8 +70,8 @@ export const ui = createSelector(
   [
     getGameStatus, getTick, getFood, getSnakeKeyPositions, getWidthHeight,
   ],
-  (gameStatus, tick, food, snakeKeyPositions, { width, height }) => (
-    { gameStatus, tick, food, snakeKeyPositions, width, height }
+  (gameStatus, tickNumber, food, snakeKeyPositions, { width, height }) => (
+    { gameStatus, tickNumber, food, snakeKeyPositions, width, height }
   )
 );
 
