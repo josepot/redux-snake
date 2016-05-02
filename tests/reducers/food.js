@@ -2,10 +2,10 @@ import assert from 'assert';
 import R from 'ramda';
 import foodReducer from '../../src/reducers/food.js';
 import { ROWS, COLS } from '../../src/config.js';
-import { positionToIndex } from '../../src/utils.js';
 
 let fakeRandomNumber;
 foodReducer.__Rewire__('getRandomInt', () => fakeRandomNumber);
+const positionToIndex = foodReducer.__get__('positionToIndex');
 
 describe('Food Reducer', () => {
   const getFoodPosition = foodReducer.__get__('getFoodPosition');

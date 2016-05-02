@@ -1,6 +1,6 @@
 import R from 'ramda';
 import {
-  didSnakeCrash, getAllSnakePositions,
+  didSnakeCrash, getAllSnakePositions, getHead,
   getCurrentDirection, getCurrentBodyLengthBuffer,
 } from './selectors.js';
 
@@ -38,7 +38,8 @@ export function tick() {
     const { direction } = getCurrentDirection(getState());
     dispatch({ type: TICK, direction });
 
-    const { head, food } = getState();
+    const { food } = getState();
+    const head = getHead(getState());
 
     if (R.equals(head, food)) {
       dispatch({
@@ -48,7 +49,7 @@ export function tick() {
         tick: getState().tickNumber,
       });
     } else if (didSnakeCrash(getState())) {
-      dispatch({ type: COLLISION, direction });
+      dispatch({ type: COLLISION });
     }
   };
 }

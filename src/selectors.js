@@ -3,7 +3,7 @@ import { List } from 'immutable';
 import { createSelector } from 'reselect';
 import { OPPOSITE_DIRECTIONS } from './reducers/directions.js';
 import evolvePosition from './evolve-position.js';
-import { COLS, ROWS, MARGIN, GROWTH_FACTOR } from './config.js';
+import { COLS, ROWS, MARGIN, GROWTH_FACTOR, initialHead } from './config.js';
 
 const GAME_WIDTH = (COLS + MARGIN.LEFT + MARGIN.RIGHT);
 const GAME_HEIGHT = (ROWS + MARGIN.TOP + MARGIN.BOTTOM);
@@ -13,7 +13,6 @@ const getDirections = R.path(['directions']);
 const getTick = R.path(['tickNumber']);
 const getGameStatus = R.path(['gameStatus']);
 const getCollectedFood = R.path(['collectedFood']);
-const getHead = R.path(['head']);
 const getDimensions = R.path(['dimensions']);
 const getFood = R.path(['food']);
 
@@ -31,6 +30,17 @@ const getBodyLength = createSelector(
 
 const getMinimumTick = createSelector([getTick, getBodyLength], R.subtract);
 
+export const getHead = createSelector(
+  [getTick, getDirections],
+  (latestTick, directions) => {
+    if (directions.size === 0) return initialHead;
+
+    const { head, direction, tick } =
+      directions.skipUntil((d) => d.tick <= latestTick).first();
+    return evolvePosition(head, direction, latestTick - tick);
+  }
+);
+
 const _getSnakeVectors =
   (latestTick, directions, minTick) => directions.skipUntil(
     ({ tick }) => tick < latestTick
@@ -38,12 +48,15 @@ const _getSnakeVectors =
   ({ tick }, idx, items) => {
     const prev = idx > 0 ? items.get(idx - 1) : undefined;
     return tick < minTick && prev !== undefined && prev.tick <= minTick;
-  }).map(({ tick, direction }, i, items) => {
-    const prevTick = i === 0 ? latestTick : items.get(i - 1).tick;
+  }).toArray().map(({ tick, direction }, i, items) => {
+    const prevTick = i === 0 ? latestTick : items[i - 1].tick;
     return { direction, len: prevTick - R.max(tick, minTick) };
   });
 export const getSnakeVectors =
-  createSelector([getTick, getDirections, getMinimumTick], _getSnakeVectors);
+  createSelector([getTick, getDirections, getMinimumTick], (tick, directions, minTick) => {
+    const res = _getSnakeVectors(tick, directions, minTick);
+    return res;
+  });
 
 const _getSnakeKeyPositions =
   (vectors, head) => vectors.reduce((prev, cur) => prev.push(evolvePosition(

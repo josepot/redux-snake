@@ -3,10 +3,9 @@ import dimensions from './dimensions.js';
 import directions from './directions.js';
 import food from './food.js';
 import gameStatus from './game-status.js';
-import head from './head.js';
 import collectedFood from './collected-food.js';
 import tickNumber from './tick-number.js';
 
 export default combineReducers({
-  dimensions, directions, food, gameStatus, head, collectedFood, tickNumber,
+  dimensions, directions, food, gameStatus, collectedFood, tickNumber,
 });

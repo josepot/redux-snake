@@ -71,7 +71,7 @@ export class App extends Component {
 
     const snakePoints = (snakeKeyPositions.size > 1 ?
       snakeKeyPositions :
-      snakeKeyPositions.unshift(snakeKeyPositions.first())
+      snakeKeyPositions.push(snakeKeyPositions.first())
     ).map(pos => `${pos.x} ${pos.y}`).join(' ');
 
     return (

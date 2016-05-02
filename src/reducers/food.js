@@ -1,6 +1,5 @@
 import { NEW_GAME, FOOD_EATEN } from '../actions.js';
-import { ROWS, COLS } from '../config.js';
-import { initialHead } from './head.js';
+import { ROWS, COLS, initialHead } from '../config.js';
 
 const positionToIndex = (position) => (position.y * COLS) + position.x;
 

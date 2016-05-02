@@ -1,5 +1,7 @@
-import { List } from 'immutable';
+import { Stack } from 'immutable';
 import { NEW_GAME, NEW_DIRECTION } from '../actions.js';
+import { initialHead } from '../config.js';
+import evolvePosition from '../evolve-position.js';
 
 export const { UP, DOWN, RIGHT, LEFT } = {
   UP: 'UP',
@@ -11,7 +13,11 @@ export const OPPOSITE_DIRECTIONS = {
   LEFT: RIGHT, RIGHT: LEFT, UP: DOWN, DOWN: UP,
 };
 
-const initialState = new List();
+const initialState = new Stack();
+
+const isNewDirectionInValid = (newDirection, latestDirection) => [
+  latestDirection, OPPOSITE_DIRECTIONS[latestDirection],
+].includes(newDirection);
 
 export default function directions(state = initialState, action) {
   switch (action.type) {
@@ -19,18 +25,16 @@ export default function directions(state = initialState, action) {
       return initialState;
     case NEW_DIRECTION: {
       const { direction, tick } = action;
+      const latest = state.first();
 
-      const latestDir = state.first() && state.first().direction;
-      const latestTick = (state.first() && state.first().tick) || -1;
-      const nextTick = tick > latestTick ? tick : latestTick + 1;
+      if (!latest) return Stack.of({ direction, tick, head: initialHead });
+      if (isNewDirectionInValid(direction, latest.direction)) return state;
 
-      // If the new direction is the same as the latest direction
-      // or the opposite of the previous direction then we don't want
-      // to add it to the List. I.e: if the snake is going left and the user
-      // hits the right arrow then we don't want to have that under consideration
-      return [latestDir, OPPOSITE_DIRECTIONS[latestDir]].includes(direction) ?
-        state :
-        state.unshift({ direction, tick: nextTick });
+      const nextTick = tick > latest.tick ? tick : latest.tick + 1;
+      const nextHead =
+        evolvePosition(latest.head, latest.direction, nextTick - latest.tick);
+
+      return state.push({ direction, tick: nextTick, head: nextHead });
     }
     default:
       return state;
