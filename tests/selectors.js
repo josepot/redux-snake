@@ -1,18 +1,18 @@
 import assert from 'assert';
 import rewire from 'rewire';
 import { List } from 'immutable';
-import { UP, DOWN, LEFT, RIGHT } from '../src/reducers/directions.js';
+import { UP, DOWN, LEFT, RIGHT } from '../src/reducers/directions-stack.js';
 
 const selectors = rewire('../src/selectors.js');
 
 describe('Selectors', () => {
   const directions = List.of(
-    { tick: 11, direction: RIGHT },
-    { tick: 10, direction: UP },
-    { tick: 8, direction: LEFT },
-    { tick: 5, direction: UP },
-    { tick: 3, direction: LEFT },
-    { tick: 0, direction: DOWN }
+    { moment: 11, direction: RIGHT },
+    { moment: 10, direction: UP },
+    { moment: 8, direction: LEFT },
+    { moment: 5, direction: UP },
+    { moment: 3, direction: LEFT },
+    { moment: 0, direction: DOWN }
   );
   const vectors = List.of(
     { direction: LEFT, len: 2 },
@@ -47,18 +47,18 @@ describe('Selectors', () => {
  * */
   describe('getSnakeVectors', () => {
     it('should ignore the non relevant directions and get the expected vectors', () => {
-      const latestTick = 10;
-      const minTick = 10;
+      const currentMoment = 10;
+      const minMoment = 10;
       const expectedResult = [{ direction: LEFT, len: 0 }];
-      const result = getSnakeVectors(latestTick, directions, minTick);
-      assert.deepEqual(result.toArray(), expectedResult);
+      const result = getSnakeVectors(currentMoment, directions, minMoment);
+      assert.deepEqual(result, expectedResult);
     });
 
     it('when the snake has only one position there should return one vector with len = 0', () => {
-      const latestTick = 10;
-      const minTick = 3;
-      const result = getSnakeVectors(latestTick, directions, minTick);
-      assert.deepEqual(result.toArray(), vectors.toArray());
+      const currentMoment = 10;
+      const minMoment = 3;
+      const result = getSnakeVectors(currentMoment, directions, minMoment);
+      assert.deepEqual(result, vectors.toArray());
     });
   });
 

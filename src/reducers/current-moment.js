@@ -3,7 +3,7 @@ import { NEW_GAME, TICK, COLLISION } from '../actions.js';
 
 export const initialState = 0;
 
-export default function tickNumer(state = initialState, action) {
+export default function currentMoment(state = initialState, action) {
   switch (action.type) {
     case NEW_GAME:
       return initialState;

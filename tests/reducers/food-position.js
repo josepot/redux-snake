@@ -1,13 +1,13 @@
 import assert from 'assert';
 import R from 'ramda';
-import foodReducer from '../../src/reducers/food.js';
+import foodReducer from '../../src/reducers/food-position.js';
 import { ROWS, COLS } from '../../src/config.js';
 
 let fakeRandomNumber;
 foodReducer.__Rewire__('getRandomInt', () => fakeRandomNumber);
 const positionToIndex = foodReducer.__get__('positionToIndex');
 
-describe('Food Reducer', () => {
+describe('foodPosition Reducer', () => {
   const getFoodPosition = foodReducer.__get__('getFoodPosition');
   const nGridPositions = ROWS * COLS;
   const halfPositions = Math.ceil(nGridPositions / 2);

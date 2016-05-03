@@ -19,7 +19,7 @@ export class App extends Component {
     super(props);
     const { dispatch } = this.props;
 
-    this.nextTick = () => {
+    this.dispatchTick = () => {
       if (this.props.gameStatus === PLAYING) {
         dispatch(tick());
       }
@@ -34,7 +34,7 @@ export class App extends Component {
       const direction = KEYBOARD_DIRECTIONS[key];
 
       if (direction && [PLAYING, READY].includes(this.props.gameStatus)) {
-        dispatch(newDirection(direction, this.props.tickNumber));
+        dispatch(newDirection(direction, this.props.currentMoment));
       } else if (key === SPACE_KEY_CODE) {
         switch (this.props.gameStatus) {
           case PLAYING:
@@ -55,7 +55,7 @@ export class App extends Component {
   componentDidMount() {
     this.updateDimensions();
     window.addEventListener('resize', this.updateDimensions);
-    window.setInterval(this.nextTick, TICK_FREQUENCY);
+    window.setInterval(this.dispatchTick, TICK_FREQUENCY);
     document.addEventListener('keydown', this.pressKey, true);
   }
 
@@ -90,7 +90,7 @@ export class App extends Component {
 
 App.propTypes = {
   gameStatus: PropTypes.string.isRequired,
-  tickNumber: PropTypes.number.isRequired,
+  currentMoment: PropTypes.number.isRequired,
   food: PropTypes.object.isRequired,
   snakeKeyPositions: PropTypes.object.isRequired,
   width: PropTypes.number.isRequired,

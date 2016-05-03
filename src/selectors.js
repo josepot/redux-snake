@@ -1,7 +1,7 @@
 import R from 'ramda';
 import { List } from 'immutable';
 import { createSelector } from 'reselect';
-import { OPPOSITE_DIRECTIONS } from './reducers/directions.js';
+import { OPPOSITE_DIRECTIONS } from './reducers/directions-stack.js';
 import evolvePosition from './evolve-position.js';
 import { COLS, ROWS, MARGIN, GROWTH_FACTOR, initialHead } from './config.js';
 
@@ -9,54 +9,47 @@ const GAME_WIDTH = (COLS + MARGIN.LEFT + MARGIN.RIGHT);
 const GAME_HEIGHT = (ROWS + MARGIN.TOP + MARGIN.BOTTOM);
 const GAME_PROPORTIONS = GAME_WIDTH / GAME_HEIGHT;
 
-const getDirections = R.path(['directions']);
-const getTick = R.path(['tickNumber']);
-const getGameStatus = R.path(['gameStatus']);
-const getCollectedFood = R.path(['collectedFood']);
+const getCurrentMoment = R.path(['currentMoment']);
 const getDimensions = R.path(['dimensions']);
-const getFood = R.path(['food']);
-
-export const getCurrentBodyLengthBuffer = createSelector(
-  [getCollectedFood, getTick],
-  (eaten, tick) => (eaten.size === 0 ? 0 :
-    eaten.last().buffer + R.max(0, GROWTH_FACTOR - (tick - eaten.last().tick))
-  )
-);
+const getDirectionsStack = R.path(['directionsStack']);
+const getFoodEaten = R.path(['foodEaten']);
+const getFoodPosition = R.path(['foodPosition']);
+const getGameStatus = R.path(['gameStatus']);
+const getGrowthBuffer = R.path(['growthBuffer', 'buffer']);
 
 const getBodyLength = createSelector(
-  [getCollectedFood, getCurrentBodyLengthBuffer],
-  (eaten, buffer) => (eaten.size * GROWTH_FACTOR) - buffer
+  [getFoodEaten, getGrowthBuffer],
+  (eaten, buffer) => (eaten * GROWTH_FACTOR) - buffer
 );
 
-const getMinimumTick = createSelector([getTick, getBodyLength], R.subtract);
+const getMinMoment =
+  createSelector([getCurrentMoment, getBodyLength], R.subtract);
 
 export const getHead = createSelector(
-  [getTick, getDirections],
-  (latestTick, directions) => {
+  [getCurrentMoment, getDirectionsStack],
+  (currentMoment, directions) => {
     if (directions.size === 0) return initialHead;
 
-    const { head, direction, tick } =
-      directions.skipUntil((d) => d.tick <= latestTick).first();
-    return evolvePosition(head, direction, latestTick - tick);
+    const { head, direction, moment } =
+      directions.skipUntil((d) => d.moment <= currentMoment).first();
+    return evolvePosition(head, direction, currentMoment - moment);
   }
 );
 
 const _getSnakeVectors =
-  (latestTick, directions, minTick) => directions.skipUntil(
-    ({ tick }) => tick < latestTick
+  (currentMoment, directions, minMoment) => directions.skipUntil(
+    ({ moment }) => moment < currentMoment
   ).takeUntil(
-  ({ tick }, idx, items) => {
+  ({ moment }, idx, items) => {
     const prev = idx > 0 ? items.get(idx - 1) : undefined;
-    return tick < minTick && prev !== undefined && prev.tick <= minTick;
-  }).toArray().map(({ tick, direction }, i, items) => {
-    const prevTick = i === 0 ? latestTick : items[i - 1].tick;
-    return { direction, len: prevTick - R.max(tick, minTick) };
+    return moment < minMoment && prev !== undefined && prev.moment <= minMoment;
+  }).toArray().map(({ moment, direction }, i, items) => {
+    const prevMoment = i === 0 ? currentMoment : items[i - 1].moment;
+    return { direction, len: prevMoment - R.max(moment, minMoment) };
   });
-export const getSnakeVectors =
-  createSelector([getTick, getDirections, getMinimumTick], (tick, directions, minTick) => {
-    const res = _getSnakeVectors(tick, directions, minTick);
-    return res;
-  });
+export const getSnakeVectors = createSelector(
+  [getCurrentMoment, getDirectionsStack, getMinMoment], _getSnakeVectors
+);
 
 const _getSnakeKeyPositions =
   (vectors, head) => vectors.reduce((prev, cur) => prev.push(evolvePosition(
@@ -81,10 +74,11 @@ const getWidthHeight = createSelector(
 
 export const ui = createSelector(
   [
-    getGameStatus, getTick, getFood, getSnakeKeyPositions, getWidthHeight,
+    getGameStatus, getCurrentMoment, getFoodPosition,
+    getSnakeKeyPositions, getWidthHeight,
   ],
-  (gameStatus, tickNumber, food, snakeKeyPositions, { width, height }) => (
-    { gameStatus, tickNumber, food, snakeKeyPositions, width, height }
+  (gameStatus, currentMoment, food, snakeKeyPositions, { width, height }) => (
+    { gameStatus, currentMoment, food, snakeKeyPositions, width, height }
   )
 );
 
@@ -118,9 +112,10 @@ export const didSnakeCrash = createSelector(
 );
 
 export const getCurrentDirection = createSelector(
-  [getDirections, getTick],
-  (directions, currentTick) => {
-    const unprocessed = directions.takeWhile(({ tick }) => tick >= currentTick);
+  [getDirectionsStack, getCurrentMoment],
+  (directions, currentMoment) => {
+    const unprocessed =
+      directions.takeWhile(({ moment }) => moment >= currentMoment);
     return unprocessed.size > 0 ? unprocessed.last() : directions.first();
   }
 );
