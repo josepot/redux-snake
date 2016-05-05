@@ -24,18 +24,19 @@ export default function directionsStack(state = initialState, action) {
     case NEW_GAME:
       return initialState;
     case NEW_DIRECTION: {
-      const { direction, moment } = action;
+      const { direction } = action;
+      let { moment } = action;
       const latest = state.first();
 
       if (!latest) return Stack.of({ direction, moment, head: initialHead });
       if (isNewDirectionInValid(direction, latest.direction)) return state;
 
-      const nextMoment = moment > latest.moment ? moment : latest.moment + 1;
-      const nextHead = evolvePosition(
-        latest.head, latest.direction, nextMoment - latest.moment
+      moment = moment > latest.moment ? moment : latest.moment + 1;
+      const position = evolvePosition(
+        latest.position, latest.direction, moment - latest.moment
       );
 
-      return state.push({ direction, moment: nextMoment, head: nextHead });
+      return state.push({ direction, moment, position });
     }
     default:
       return state;

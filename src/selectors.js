@@ -30,9 +30,9 @@ export const getHead = createSelector(
   (currentMoment, directions) => {
     if (directions.size === 0) return initialHead;
 
-    const { head, direction, moment } =
+    const { position, direction, moment } =
       directions.skipUntil((d) => d.moment <= currentMoment).first();
-    return evolvePosition(head, direction, currentMoment - moment);
+    return evolvePosition(position, direction, currentMoment - moment);
   }
 );
 
