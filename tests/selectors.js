@@ -1,12 +1,12 @@
 import assert from 'assert';
 import rewire from 'rewire';
-import { List } from 'immutable';
-import { UP, DOWN, LEFT, RIGHT } from '../src/reducers/directions-stack.js';
+import { List, Stack } from 'immutable';
+import { UP, DOWN, LEFT, RIGHT } from '../src/constants';
 
-const selectors = rewire('../src/selectors.js');
+const selectors = rewire('../src/queries/snake');
 
 describe('Selectors', () => {
-  const directions = List.of(
+  const directions = Stack.of(
     { moment: 11, direction: RIGHT },
     { moment: 10, direction: UP },
     { moment: 8, direction: LEFT },
@@ -15,15 +15,29 @@ describe('Selectors', () => {
     { moment: 0, direction: DOWN }
   );
   const vectors = List.of(
-    { direction: LEFT, len: 2 },
-    { direction: UP, len: 3 },
-    { direction: LEFT, len: 2 }
+    { direction: RIGHT, len: 2 },
+    { direction: DOWN, len: 3 },
+    { direction: RIGHT, len: 2 }
   );
   const head = { x: 1, y: 1 };
 
-  const getSnakeVectors = selectors.__get__('_getSnakeVectors');
-  const getSnakeKeyPositions = selectors.__get__('_getSnakeKeyPositions');
-  const getAllSnakePositions = selectors.__get__('_getAllSnakePositions');
+  const getSnakeVectors = selectors.__get__('getSnakeVectors$');
+  const getSnakeKeyPositions = selectors.__get__('getSnakeKeyPositions$');
+  const getAllSnakePositions = selectors.__get__('getSnakePositions$');
+  const didHeadHitBody = selectors.__get__('didHeadHitBody');
+
+  describe('getHeadHitBody', () => {
+    it('should hit the body', () => {
+      const keyPositions = List.of(
+        { x: 10, y: 13 },
+        { x: 14, y: 13 },
+        { x: 14, y: 14 },
+        { x: 10, y: 14 },
+        { x: 10, y: 10 }
+      );
+      assert(didHeadHitBody(keyPositions.first(), keyPositions));
+    });
+  });
 
 /*
  *  In a case like the following, where the snake is moving towards the left:
@@ -38,9 +52,9 @@ describe('Selectors', () => {
  * 5 | | | | | | |
  *    ‾ ‾ ‾ ‾ ‾ ‾
  *  It should return: [
- *    { direction: 'LEFT', len: 2 },
- *    { direction: 'UP', len: 3 },
- *    { direction: 'LEFT', len: 2 },
+ *    { direction: 'RIGHT', len: 2 },
+ *    { direction: 'DOWN', len: 3 },
+ *    { direction: 'RIGHT', len: 2 },
  *  ]
  *  Notice that the sum of the len of the vectors will always be one unit less
  *  than the body length. This is because the vectors are from the head of the snake.
@@ -49,7 +63,7 @@ describe('Selectors', () => {
     it('should ignore the non relevant directions and get the expected vectors', () => {
       const currentMoment = 10;
       const minMoment = 10;
-      const expectedResult = [{ direction: LEFT, len: 0 }];
+      const expectedResult = [{ direction: RIGHT, len: 0 }];
       const result = getSnakeVectors(currentMoment, directions, minMoment);
       assert.deepEqual(result, expectedResult);
     });

@@ -3,7 +3,7 @@ const webpack = require('webpack');
 
 module.exports = {
   devtool: 'eval',
-  entry: ['./src/index.js'],
+  entry: ['babel-polyfill', './src/index.js'],
 
   output: {
     path: path.join(__dirname, 'dist'),
