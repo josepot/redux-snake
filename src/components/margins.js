@@ -1,26 +1,53 @@
 import React, { PropTypes } from 'react';
-import { COLS, ROWS, MARGIN } from '../config.js';
 
-export const Margins = (props) => {
-  const { viewbox } = props;
-  const horizontalTo = viewbox.width + viewbox.x;
-  const horizontalTop = viewbox.y + (0.5 * MARGIN.TOP);
-  const horizontalBottom = ROWS + ((MARGIN.BOTTOM - 1) * 0.5);
-  const verticalTo = viewbox.height + viewbox.y;
-  const verticalLeft = viewbox.x + (0.5 * MARGIN.LEFT);
-  const verticalRight = COLS + ((MARGIN.RIGHT - 1) * 0.5);
+const Margins = ({
+  horizontal: {
+    xStart, xEnd, top, bottom,
+  },
+  vertical: {
+    yStart, yEnd, left, right,
+  },
+}) => (
+  <g stroke={'#CBC3BA'}>
+    {/* Margin Top */}
+    <line x1={xStart} x2={xEnd} y1={top.y} y2={top.y} strokeWidth={top.width} />
+    {/* Margin Bottom */}
+    <line x1={xStart} x2={xEnd} y1={bottom.y} y2={bottom.y} strokeWidth={bottom.width} />
 
-  return (
-    <g stroke={'#CBC3BA'}>
-    <line x1={viewbox.x} x2={horizontalTo} y1={horizontalTop} y2={horizontalTop} strokeWidth={MARGIN.TOP} />
-    <line x1={viewbox.x} x2={horizontalTo} y1={horizontalBottom} y2={horizontalBottom} strokeWidth={MARGIN.BOTTOM} />
+    {/* Margin Left */}
+    <line y1={yStart} y2={yEnd} x1={left.x} x2={left.x} strokeWidth={left.width} />
+    {/* Margin Right */}
+    <line y1={yStart} y2={yEnd} x1={right.x} x2={right.x} strokeWidth={right.width} />
+  </g>
+);
 
-    <line y1={viewbox.y} y2={verticalTo} x1={verticalLeft} x2={verticalLeft} strokeWidth={MARGIN.LEFT} />
-    <line y1={viewbox.y} y2={verticalTo} x1={verticalRight} x2={verticalRight} strokeWidth={MARGIN.RIGHT} />
-    </g>
-  );
+export const stateProps = {
+  horizontal: PropTypes.shape({
+    xStart: PropTypes.number.isRequired,
+    xEnd: PropTypes.number.isRequired,
+    top: PropTypes.shape({
+      y: PropTypes.number.isRequired,
+      width: PropTypes.number.isRequired,
+    }).isRequired,
+    bottom: PropTypes.shape({
+      y: PropTypes.number.isRequired,
+      width: PropTypes.number.isRequired,
+    }).isRequired,
+  }).isRequired,
+  vertical: PropTypes.shape({
+    yStart: PropTypes.number.isRequired,
+    yEnd: PropTypes.number.isRequired,
+    left: PropTypes.shape({
+      x: PropTypes.number.isRequired,
+      width: PropTypes.number.isRequired,
+    }),
+    right: PropTypes.shape({
+      x: PropTypes.number.isRequired,
+      width: PropTypes.number.isRequired,
+    }),
+  }).isRequired,
 };
 
-Margins.propTypes = {
-  viewbox: PropTypes.object.isRequired,
-};
+Margins.propTypes = stateProps;
+
+export default Margins;

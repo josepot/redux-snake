@@ -1,53 +1,34 @@
-import R from 'ramda';
-import {
-  didSnakeCrash, getAllSnakePositions, getHead, getCurrentDirection,
-} from './selectors.js';
-
-export const NEW_GAME = 'NEW_GAME';
-export const NEW_DIRECTION = 'NEW_DIRECTION';
-export const FOOD_EATEN = 'FOOD_EATEN';
-export const TICK = 'TICK';
-export const COLLISION = 'COLLISION';
-export const PAUSE = 'PAUSE';
-export const RESUME = 'RESUME';
-export const RESIZE = 'RESIZE';
-
-export function newGame() {
-  return { type: NEW_GAME };
+// Helper functions
+function createTypes(base, types) {
+  const res = {};
+  types.forEach(type => { res[type] = `app/${base}/${type}`; });
+  return res;
 }
 
-export function pause() {
-  return { type: PAUSE };
-}
+const action = (type, payload = {}) => ({ type, payload });
 
-export function resize(width, height) {
-  return { type: RESIZE, width, height };
-}
+// Action Types
+export const UI = createTypes('UI', [
+  'KEY_PRESSED', 'WINDOW_RESIZED',
+]);
 
-export function resume() {
-  return { type: RESUME };
-}
+export const GAME = createTypes('GAME', [
+  'COLLISION', 'DIRECTION_CHANGED', 'FOOD_EATEN', 'NEW', 'TICK',
+]);
 
-export function newDirection(direction, moment) {
-  return { type: NEW_DIRECTION, direction, moment };
-}
+// Action Creators
+export const ui = {
+  onKeyPressed: keyCode => action(UI.KEY_PRESSED, { keyCode }),
+  onWindowResized:
+    (width, height) => action(UI.WINDOW_RESIZED, { width, height }),
+};
 
-export function tick() {
-  return (dispatch, getState) => {
-    const { direction } = getCurrentDirection(getState());
-    dispatch({ type: TICK, direction });
-
-    const { foodPosition, currentMoment } = getState();
-    const head = getHead(getState());
-
-    if (R.equals(head, foodPosition)) {
-      dispatch({
-        type: FOOD_EATEN,
-        allSnakePositions: getAllSnakePositions(getState()),
-        moment: currentMoment,
-      });
-    } else if (didSnakeCrash(getState())) {
-      dispatch({ type: COLLISION, moment: currentMoment });
-    }
-  };
-}
+export const game = {
+  onCollision: (moment) => action(GAME.COLLISION, { moment }),
+  onDirectionChanged: (direction, moment) =>
+    action(GAME.DIRECTION_CHANGED, { direction, moment }),
+  onFoodEaten: (foodPosition, moment) =>
+    action(GAME.FOOD_EATEN, { foodPosition, moment }),
+  onStartNewGame: foodPosition => action(GAME.NEW, { foodPosition }),
+  onTick: () => action(GAME.TICK),
+};

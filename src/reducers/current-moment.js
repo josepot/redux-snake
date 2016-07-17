@@ -1,17 +1,10 @@
 import R from 'ramda';
-import { NEW_GAME, TICK, COLLISION } from '../actions.js';
+import { GAME } from '../actions';
 
 export const initialState = 0;
 
-export default function currentMoment(state = initialState, action) {
-  switch (action.type) {
-    case NEW_GAME:
-      return initialState;
-    case TICK:
-      return R.inc(state);
-    case COLLISION:
-      return R.dec(state);
-    default:
-      return state;
-  }
-}
+export default (state = initialState, { type }) => R.propOr(R.identity, type, {
+  [GAME.NEW]: R.always(initialState),
+  [GAME.TICK]: R.inc,
+  [GAME.COLLISION]: R.dec,
+})(state);

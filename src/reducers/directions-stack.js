@@ -1,17 +1,8 @@
 import { Stack } from 'immutable';
-import { NEW_GAME, NEW_DIRECTION } from '../actions.js';
-import { initialHead } from '../config.js';
-import evolvePosition from '../evolve-position.js';
-
-export const { UP, DOWN, RIGHT, LEFT } = {
-  UP: 'UP',
-  DOWN: 'DOWN',
-  RIGHT: 'RIGHT',
-  LEFT: 'LEFT',
-};
-export const OPPOSITE_DIRECTIONS = {
-  LEFT: RIGHT, RIGHT: LEFT, UP: DOWN, DOWN: UP,
-};
+import { GAME } from '../actions';
+import { initialHead } from '../config';
+import evolvePosition from '../utils/evolve-position';
+import { OPPOSITE_DIRECTIONS } from '../constants';
 
 const initialState = new Stack();
 
@@ -19,16 +10,16 @@ const isNewDirectionInValid = (newDirection, latestDirection) => [
   latestDirection, OPPOSITE_DIRECTIONS[latestDirection],
 ].includes(newDirection);
 
-export default function directionsStack(state = initialState, action) {
-  switch (action.type) {
-    case NEW_GAME:
+export default (state = initialState, { type, payload }) => {
+  switch (type) {
+    case GAME.NEW:
       return initialState;
-    case NEW_DIRECTION: {
-      const { direction } = action;
-      let { moment } = action;
+    case GAME.DIRECTION_CHANGED: {
+      const { direction } = payload;
+      let { moment } = payload;
       const latest = state.first();
 
-      if (!latest) return Stack.of({ direction, moment, head: initialHead });
+      if (!latest) return Stack.of({ direction, moment, position: initialHead });
       if (isNewDirectionInValid(direction, latest.direction)) return state;
 
       moment = moment > latest.moment ? moment : latest.moment + 1;
@@ -41,4 +32,4 @@ export default function directionsStack(state = initialState, action) {
     default:
       return state;
   }
-}
+};

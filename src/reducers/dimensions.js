@@ -1,8 +1,7 @@
-import R from 'ramda';
-import { RESIZE } from '../actions.js';
+import { UI } from '../actions';
 
 const initialState = { width: 800, height: 600 };
 
-export default function dimensions(state = initialState, action) {
-  return action.type === RESIZE ? R.pick(['width', 'height'], action) : state;
-}
+export default (state = initialState, { type, payload }) => (
+  type === UI.WINDOW_RESIZED ? payload : state
+);
