@@ -1,8 +1,6 @@
 import R from 'ramda';
-import { List } from 'immutable';
 import { createSelector } from 'reselect';
 
-import { OPPOSITE_DIRECTIONS } from '../constants';
 import evolvePosition from '../utils/evolve-position';
 import { COLS, ROWS, GROWTH_FACTOR, initialHead } from '../config';
 
@@ -17,65 +15,95 @@ const getBodyLength = createSelector(
   (eaten, buffer) => (eaten * GROWTH_FACTOR) - buffer
 );
 
-const getMinMoment = createSelector(
+// The moment when the head of the snake was in the position of the current tail
+const getTailMoment = createSelector(
   [getCurrentMoment, getBodyLength],
   R.subtract
 );
 
-const getHead$ = (currentMoment, directions) => {
-  if (directions.size === 0) return initialHead;
-
-  const directionMomentIsSmallerOrEqualCurrentMoment = R.compose(
-    R.gte(currentMoment), R.prop('moment')
+const getRelevantDirections$ = (currentMoment, tailMoment, directions) => {
+  const isFutureDirection = R.compose(
+    x => x > currentMoment, R.prop('moment')
   );
-  const { position, direction, moment: directionMoment } =
-    directions.skipUntil(directionMomentIsSmallerOrEqualCurrentMoment).first();
-  return evolvePosition(position, direction, currentMoment - directionMoment);
-};
 
+  const isTailsDirection = ({ moment }, idx, items) => {
+    const prev = idx > 0 ? items.get(idx - 1) : undefined;
+    return moment < tailMoment && prev !== undefined && prev.moment <= tailMoment;
+  };
+
+  return directions
+    .skipWhile(isFutureDirection)
+    .takeUntil(isTailsDirection)
+    .toList();
+};
+const getRelevantDirections = createSelector(
+  [getCurrentMoment, getTailMoment, getDirectionsStack],
+  getRelevantDirections$
+);
+
+const getHead$ = (currentMoment, relevantDirections) => {
+  if (relevantDirections.isEmpty()) return initialHead;
+
+  const currentDirection = relevantDirections.first();
+  return evolvePosition(
+    currentDirection.position,
+    currentDirection.direction,
+    currentMoment - currentDirection.moment
+  );
+};
 export const getHead = createSelector(
-  [getCurrentMoment, getDirectionsStack],
+  [getCurrentMoment, getRelevantDirections],
   getHead$
 );
 
-const getSnakeVectors$ =
-  (currentMoment, directions, minMoment) => directions.skipUntil(
-    ({ moment }) => moment < currentMoment
-  ).takeUntil(
-  ({ moment }, idx, items) => {
-    const prev = idx > 0 ? items.get(idx - 1) : undefined;
-    return moment < minMoment && prev !== undefined && prev.moment <= minMoment;
-  }).toArray()
-    .map(({ moment, direction }, i, items) => {
-      const prevMoment = i === 0 ? currentMoment : items[i - 1].moment;
-      return {
-        direction: OPPOSITE_DIRECTIONS[direction],
-        len: prevMoment - R.max(moment, minMoment),
-      };
-    });
-const getSnakeVectors = createSelector(
-  [getCurrentMoment, getDirectionsStack, getMinMoment],
-  getSnakeVectors$
+const getTail$ = (tailMoment, relevantDirections) => {
+  if (relevantDirections.isEmpty()) return initialHead;
+
+  const lastDirection = relevantDirections.last();
+  return evolvePosition(
+    lastDirection.position,
+    lastDirection.direction,
+    tailMoment - lastDirection.moment
+  );
+};
+export const getTail = createSelector(
+  [getTailMoment, getRelevantDirections],
+  getTail$
 );
 
-const getSnakeKeyPositions$ =
-  (vectors, head) => vectors.reduce((prev, cur) => prev.push(evolvePosition(
-    prev.last(), cur.direction, cur.len
-  )), List.of(head));
+const getSnakeKeyPositions$ = (head, tail, relevantDirections) => {
+  const result = relevantDirections.pop().map(R.prop('position')).push(tail);
 
+  return R.equals(head, result.first()) ?
+    result :
+    result.unshift(head);
+};
 export const getSnakeKeyPositions = createSelector(
-  [getSnakeVectors, getHead],
+  [getHead, getTail, getRelevantDirections],
   getSnakeKeyPositions$
 );
 
-const getSnakePositions$ =
-  (vectors, head) => vectors.reduce((prev, { len, direction }) => prev.concat(
-    ...R.range(0, len).map((inc) => evolvePosition(
-      R.last(prev), direction, inc + 1
-    ))
-  ), [head]);
+const getPositionsInBetween = (point1, point2) => {
+  const commonProperty = point1.x === point2.x ? 'x' : 'y';
+  const variableProperty = commonProperty === 'x' ? 'y' : 'x';
+
+  const minValue = R.min(point1[variableProperty], point2[variableProperty]);
+  const maxValue = R.max(point1[variableProperty], point2[variableProperty]);
+
+  return R.range(minValue + 1, maxValue).map(value => ({
+    [variableProperty]: value,
+    [commonProperty]: point1[commonProperty],
+  }));
+};
+
+const getSnakePositions$ = keyPositions => keyPositions.skip(1).reduce(
+  (prev, current) => prev.concat(
+    getPositionsInBetween(R.last(prev), current).concat(current)
+  ),
+  [keyPositions.first()]
+);
 export const getSnakePositions = createSelector(
-  [getSnakeVectors, getHead],
+  [getSnakeKeyPositions],
   getSnakePositions$
 );
 

@@ -10,19 +10,30 @@ const isNewDirectionInValid = (newDirection, latestDirection) => [
   latestDirection, OPPOSITE_DIRECTIONS[latestDirection],
 ].includes(newDirection);
 
-export default (state = initialState, { type, payload }) => {
+export default (
+  state = initialState,
+  { type, payload: { direction, moment: currentMoment } = {} }
+) => {
   switch (type) {
     case GAME.NEW:
       return initialState;
     case GAME.DIRECTION_CHANGED: {
-      const { direction } = payload;
-      let { moment } = payload;
       const latest = state.first();
 
-      if (!latest) return Stack.of({ direction, moment, position: initialHead });
+      if (!latest) {
+        return Stack.of({
+          direction,
+          moment: currentMoment,
+          position: initialHead,
+        });
+      }
+
       if (isNewDirectionInValid(direction, latest.direction)) return state;
 
-      moment = moment > latest.moment ? moment : latest.moment + 1;
+      const moment = currentMoment > latest.moment ?
+        currentMoment :
+        latest.moment + 1;
+
       const position = evolvePosition(
         latest.position, latest.direction, moment - latest.moment
       );
