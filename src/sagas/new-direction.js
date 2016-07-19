@@ -2,8 +2,7 @@ import R from 'ramda';
 import { select, take, put } from 'redux-saga/effects';
 
 import { UI, game } from '../actions';
-import { READY, PLAYING } from '../reducers/game-status';
-import { KEYBOARD_DIRECTIONS } from '../constants';
+import { GAME_STATUS, KEYBOARD_DIRECTIONS } from '../constants';
 
 export function* watchNewDirection() {
   while (true) {
@@ -14,7 +13,7 @@ export function* watchNewDirection() {
     const { gameStatus, currentMoment } =
       yield select(R.pick(['gameStatus', 'currentMoment']));
 
-    if ([PLAYING, READY].indexOf(gameStatus) > -1) {
+    if ([GAME_STATUS.PLAYING, GAME_STATUS.READY].indexOf(gameStatus) > -1) {
       yield put(
         game.onDirectionChanged(
           KEYBOARD_DIRECTIONS[keyCode],
@@ -23,6 +22,6 @@ export function* watchNewDirection() {
       );
     }
 
-    if (gameStatus === READY) yield put(game.onTick());
+    if (gameStatus === GAME_STATUS.READY) yield put(game.onTick());
   }
 }
