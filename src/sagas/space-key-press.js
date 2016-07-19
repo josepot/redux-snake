@@ -2,8 +2,7 @@ import R from 'ramda';
 import { select, take, put } from 'redux-saga/effects';
 
 import { UI, game } from '../actions';
-import { SPACE_KEY_CODE } from '../constants';
-import { READY, PLAYING } from '../reducers/game-status';
+import { GAME_STATUS, SPACE_KEY_CODE } from '../constants';
 import { initialHead } from '../config';
 import getFoodPosition from '../utils/get-food-position';
 
@@ -16,14 +15,14 @@ export function* watchSpaceKey() {
     const { gameStatus, currentMoment } =
       yield select(R.pick(['gameStatus', 'currentMoment']));
 
-    if (gameStatus === READY && currentMoment > 0) {
+    if (gameStatus === GAME_STATUS.READY && currentMoment > 0) {
       yield put(
         game.onStartNewGame(
           getFoodPosition([initialHead]))
       );
     }
 
-    if (gameStatus === PLAYING) {
+    if (gameStatus === GAME_STATUS.PLAYING) {
       yield put(game.onTick());
     }
   }

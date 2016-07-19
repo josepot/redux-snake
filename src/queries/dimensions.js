@@ -57,7 +57,6 @@ const getGameProportions = R.once(() => {
   return width / height;
 });
 
-
 const getDimensions = R.path(['dimensions']);
 
 export const getGameDimensions = createSelector(
@@ -76,3 +75,8 @@ export const getGameDimensions = createSelector(
     };
   }
 );
+
+export const getMessagesPosition = R.once(() => ({
+  x: COLS / 2,
+  y: ROWS + (MARGIN.BOTTOM / 3.5),
+}));

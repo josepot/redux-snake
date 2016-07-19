@@ -2,8 +2,8 @@ import R from 'ramda';
 import { delay, takeEvery } from 'redux-saga';
 import { call, select, put } from 'redux-saga/effects';
 
+import { GAME_STATUS } from '../constants';
 import { TICK_FREQUENCY } from '../config';
-import { PLAYING } from '../reducers/game-status';
 import getFoodPosition from '../utils/get-food-position';
 import {
   getIsFoodEaten,
@@ -26,7 +26,7 @@ function* handleTick() {
 
   yield call(delay, TICK_FREQUENCY);
   const gameStatus = yield select(R.prop('gameStatus'));
-  if (gameStatus === PLAYING) yield put(game.onTick());
+  if (gameStatus === GAME_STATUS.PLAYING) yield put(game.onTick());
   return null;
 }
 

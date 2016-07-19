@@ -8,12 +8,14 @@ import { ui } from '../actions';
 import Background from '../components/background';
 import Food from '../components/food';
 import Margins from '../components/margins';
+import Messages from '../components/messages';
 import Snake from '../components/snake';
 
 const App = ({
   dimensions: { width, height },
   foodProps,
   marginProps,
+  messagesProps,
   snakeProps,
   viewboxStr,
 }) => (
@@ -24,6 +26,7 @@ const App = ({
     {
       foodProps ? <Food {...foodProps} /> : null
     }
+    <Messages {...messagesProps} />
   </svg>
 );
 
@@ -34,6 +37,7 @@ const stateProps = {
   }).isRequired,
   foodProps: PropTypes.shape(Food.stateProps),
   marginProps: PropTypes.shape(Margins.stateProps),
+  messagesProps: PropTypes.shape(Messages.stateProps),
   snakeProps: PropTypes.shape(Snake.stateProps),
   viewboxStr: PropTypes.string.isRequired,
 };

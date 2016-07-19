@@ -16,3 +16,25 @@ export const { UP, DOWN, RIGHT, LEFT } = {
 export const OPPOSITE_DIRECTIONS = {
   LEFT: RIGHT, RIGHT: LEFT, UP: DOWN, DOWN: UP,
 };
+
+export const GAME_STATUS = {
+  READY: 'READY',
+  PLAYING: 'PLAYING',
+  PAUSED: 'PAUSED',
+  ENDED: 'ENDED',
+};
+
+export const MESSAGES = {
+  [GAME_STATUS.READY]: {
+    main: 'READY TO START',
+    sub: 'Press an arrow key to start moving',
+  },
+  [GAME_STATUS.PAUSED]: {
+    main: 'PAUSED',
+    sub: 'Press the space key to resume the game',
+  },
+  [GAME_STATUS.ENDED]: {
+    main: 'GAME OVER',
+    sub: 'Press the space key to start a new game',
+  },
+};
