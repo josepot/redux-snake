@@ -24,7 +24,7 @@ export const ui = {
 };
 
 export const game = {
-  onCollision: (moment) => action(GAME.COLLISION, { moment }),
+  onCollision: () => action(GAME.COLLISION),
   onDirectionChanged: (direction, moment) =>
     action(GAME.DIRECTION_CHANGED, { direction, moment }),
   onFoodEaten: (foodPosition, moment) =>

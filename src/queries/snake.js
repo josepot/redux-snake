@@ -4,11 +4,11 @@ import { createSelector } from 'reselect';
 import evolvePosition from '../utils/evolve-position';
 import { COLS, ROWS, GROWTH_FACTOR, initialHead } from '../config';
 
-const getCurrentMoment = R.path(['currentMoment']);
+export const getCurrentMoment = R.path(['currentMoment']);
 const getDirectionsStack = R.path(['directionsStack']);
 const getFoodEaten = R.path(['foodEaten']);
 export const getFoodPosition = R.path(['foodPosition']);
-const getGrowthBuffer = R.path(['growthBuffer', 'value']);
+const getGrowthBuffer = R.path(['growthBuffer', 'current']);
 
 const getBodyLength = createSelector(
   [getFoodEaten, getGrowthBuffer],

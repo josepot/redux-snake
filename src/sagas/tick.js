@@ -6,6 +6,7 @@ import { GAME_STATUS } from '../constants';
 import { TICK_FREQUENCY } from '../config';
 import getFoodPosition from '../utils/get-food-position';
 import {
+  getCurrentMoment,
   getIsFoodEaten,
   getIsThereCollision,
   getSnakePositions,
@@ -14,10 +15,10 @@ import {
 import { GAME, game } from '../actions';
 
 function* handleTick() {
-  const currentMoment = yield select(R.prop('currentMoment'));
   const isThereCollision = yield select(getIsThereCollision);
-  if (isThereCollision) return yield put(game.onCollision(currentMoment));
+  if (isThereCollision) return yield put(game.onCollision());
 
+  const currentMoment = yield select(getCurrentMoment);
   const isFoodEaten = yield select(getIsFoodEaten);
   if (isFoodEaten) {
     const snakePositions = yield select(getSnakePositions);
