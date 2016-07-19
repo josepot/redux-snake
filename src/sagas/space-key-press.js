@@ -1,5 +1,7 @@
 import R from 'ramda';
 import { select, take, put } from 'redux-saga/effects';
+import { createStructuredSelector } from 'reselect';
+import { getCurrentMoment } from '../queries/snake';
 
 import { UI, game } from '../actions';
 import { GAME_STATUS, SPACE_KEY_CODE } from '../constants';
@@ -13,7 +15,10 @@ export function* watchSpaceKey() {
         type === UI.KEY_PRESSED && keyCode === SPACE_KEY_CODE
     );
     const { gameStatus, currentMoment } =
-      yield select(R.pick(['gameStatus', 'currentMoment']));
+      yield select(createStructuredSelector({
+        gameStatus: R.prop('gameStatus'),
+        currentMoment: getCurrentMoment,
+      }));
 
     if (gameStatus === GAME_STATUS.READY && currentMoment > 0) {
       yield put(
