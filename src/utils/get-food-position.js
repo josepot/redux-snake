@@ -1,19 +1,36 @@
 import { ROWS, COLS } from '../config';
 
-const positionToIndex = (position) => (position.y * COLS) + position.x;
+const getRandomInt = (limit) => Math.floor(Math.random() * limit);
 
+const positionToIndex = (position) => (position.y * COLS) + position.x;
 const indexToPosition =
   (index) => ({ y: Math.trunc(index / COLS), x: index % COLS });
 
-const getRandomInt = (limit) => Math.floor(Math.random() * limit);
+const getSnakePositionsIndexedSet = keyPositions => {
+  const result = new Set();
 
-export default snakePositions => {
-  const sortedSnakePositions =
-    snakePositions.map(positionToIndex).sort((a, b) => a - b);
-  const nAvailablePositions = (ROWS * COLS) - sortedSnakePositions.length;
-  const winner = getRandomInt(nAvailablePositions);
-  return indexToPosition(sortedSnakePositions.reduce(
-    (result, index) => (result >= index ? result + 1 : result),
-    winner
-  ));
+  keyPositions.map(positionToIndex).forEach((current, idx, items) => {
+    const next = items.get(idx + 1);
+
+    if (next === undefined) return result.add(current);
+
+    const diff = next - current;
+    const increment = (Math.abs(diff) < COLS ? 1 : COLS) * (diff < 0 ? -1 : 1);
+
+    for (let i = current; i !== next; i += increment) result.add(i);
+    return true;
+  });
+
+  return result;
+};
+
+export default snakeKeyPositions => {
+  const snakePositionsIndexedSet = getSnakePositionsIndexedSet(snakeKeyPositions);
+  const nAvailablePositions = (ROWS * COLS) - snakePositionsIndexedSet.size;
+
+  let winner = getRandomInt(nAvailablePositions);
+  for (let i = 0; i <= winner; i++) {
+    if (snakePositionsIndexedSet.has(i)) winner++;
+  }
+  return indexToPosition(winner);
 };

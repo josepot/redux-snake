@@ -83,30 +83,6 @@ export const getSnakeKeyPositions = createSelector(
   getSnakeKeyPositions$
 );
 
-const getPositionsInBetween = (point1, point2) => {
-  const commonProperty = point1.x === point2.x ? 'x' : 'y';
-  const variableProperty = commonProperty === 'x' ? 'y' : 'x';
-
-  const minValue = R.min(point1[variableProperty], point2[variableProperty]);
-  const maxValue = R.max(point1[variableProperty], point2[variableProperty]);
-
-  return R.range(minValue + 1, maxValue).map(value => ({
-    [variableProperty]: value,
-    [commonProperty]: point1[commonProperty],
-  }));
-};
-
-const getSnakePositions$ = keyPositions => keyPositions.skip(1).reduce(
-  (prev, current) => prev.concat(
-    getPositionsInBetween(R.last(prev), current).concat(current)
-  ),
-  [keyPositions.first()]
-);
-export const getSnakePositions = createSelector(
-  [getSnakeKeyPositions],
-  getSnakePositions$
-);
-
 const isHeadOutOfBounds = ({ x, y }) => x < 0 || y < 0 || x >= COLS || y >= ROWS;
 
 const didHeadHitBody = (head, keyPositions) =>

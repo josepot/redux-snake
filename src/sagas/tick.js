@@ -9,7 +9,7 @@ import {
   getCurrentMoment,
   getIsFoodEaten,
   getIsThereCollision,
-  getSnakePositions,
+  getSnakeKeyPositions,
 } from '../queries/snake';
 
 import { GAME, game } from '../actions';
@@ -21,8 +21,10 @@ function* handleTick() {
   const currentMoment = yield select(getCurrentMoment);
   const isFoodEaten = yield select(getIsFoodEaten);
   if (isFoodEaten) {
-    const snakePositions = yield select(getSnakePositions);
-    yield put(game.onFoodEaten(getFoodPosition(snakePositions), currentMoment));
+    const snakeKeyPositions = yield select(getSnakeKeyPositions);
+    yield put(
+      game.onFoodEaten(getFoodPosition(snakeKeyPositions), currentMoment)
+    );
   }
 
   yield call(delay, TICK_FREQUENCY);

@@ -1,5 +1,6 @@
 import R from 'ramda';
 import { fork, put } from 'redux-saga/effects';
+import { List } from 'immutable';
 
 import * as newDirection from './new-direction';
 import * as spaceKeyPress from './space-key-press';
@@ -15,7 +16,8 @@ const forkAllSagas = R.pipe(
 export default function* root() {
   yield put(
     game.onStartNewGame(
-      getFoodPosition([initialHead]))
+      getFoodPosition(List.of(initialHead))
+    )
   );
   yield forkAllSagas([
     newDirection,
