@@ -1,13 +1,13 @@
-import R from 'ramda';
 import { combineReducers } from 'redux';
 
+import currentMoment from './current-moment';
 import dimensions from './dimensions';
 import directionsStack from './directions-stack';
 import foodEaten from './food-eaten';
 import foodPosition from './food-position';
 import gameStatus from './game-status';
 import growthBuffer from './growth-buffer';
-import currentMoment from './current-moment';
+import latestTick from './latest-tick';
 
 export default combineReducers({
   currentMoment,
@@ -17,4 +17,5 @@ export default combineReducers({
   foodPosition,
   gameStatus,
   growthBuffer,
+  latestTick,
 });
