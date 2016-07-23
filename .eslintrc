@@ -1,5 +1,6 @@
 {
   "extends": "airbnb",
+  "no-underscore-dangle": false,
   "parserOptions":{
     "ecmaFeatures": {
       "experimentalObjectRestSpread": true
