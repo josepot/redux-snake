@@ -14,13 +14,12 @@ import Snake from '../components/snake';
 const App = ({
   dimensions: { width, height },
   foodProps,
-  marginProps,
   messagesProps,
   snakeProps,
   viewboxStr,
 }) => (
   <svg width={width} height={height} viewBox={viewboxStr}>
-    <Margins {...marginProps} />
+    <Margins />
     <Background />
     <Snake {...snakeProps} />
     {
@@ -36,7 +35,6 @@ const stateProps = {
     height: PropTypes.number.isRequired,
   }).isRequired,
   foodProps: PropTypes.shape(Food.stateProps),
-  marginProps: PropTypes.shape(Margins.stateProps),
   messagesProps: PropTypes.shape(Messages.stateProps),
   snakeProps: PropTypes.shape(Snake.stateProps),
   viewboxStr: PropTypes.string.isRequired,
