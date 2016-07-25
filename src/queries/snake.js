@@ -1,13 +1,14 @@
 import R from 'ramda';
 import { createSelector } from 'reselect';
 
+import createSelectorTrackingArguments from '../utils/create-selector-tracking-arguments';
+import getFoodPosition$ from '../utils/get-food-position';
 import evolvePosition from '../utils/evolve-position';
 import { COLS, ROWS, GROWTH_FACTOR, initialHead } from '../config';
 
 export const getCurrentMoment = R.path(['currentMoment']);
 const getDirectionsStack = R.path(['directionsStack']);
 const getFoodEaten = R.path(['foodEaten']);
-export const getFoodPosition = R.path(['foodPosition']);
 const getGrowthBuffer = R.path(['growthBuffer', 'current']);
 
 const getBodyLength = createSelector(
@@ -27,8 +28,8 @@ const getRelevantDirections$ = (currentMoment, tailMoment, directions) => {
   );
 
   const isTailsDirection = ({ moment }, idx, items) => {
-    const prev = idx > 0 ? items.get(idx - 1) : undefined;
-    return moment < tailMoment && prev !== undefined && prev.moment <= tailMoment;
+    const prev = idx > 0 ? items.get(idx - 1) : null;
+    return moment < tailMoment && prev !== null && prev.moment <= tailMoment;
   };
 
   return directions
@@ -89,10 +90,13 @@ const didHeadHitBody = (head, keyPositions) =>
   keyPositions.skip(3).some((current, idx, items) => {
     const next = items.get(idx + 1);
     if (next === undefined) return false;
-    const { constProp, varProp } = current.x === next.x ?
-      { constProp: 'x', varProp: 'y' } : { constProp: 'y', varProp: 'x' };
-    const { min, max } = current[varProp] < next[varProp] ?
-      { min: current, max: next } : { min: next, max: current };
+
+    const [constProp, varProp] = current.x === next.x ?
+      ['x', 'y'] :
+      ['y', 'x'];
+    const [min, max] = current[varProp] < next[varProp] ?
+      [current, next] :
+      [next, current];
 
     return head[constProp] === current[constProp] &&
       head[varProp] >= min[varProp] && head[varProp] <= max[varProp];
@@ -101,6 +105,13 @@ const didHeadHitBody = (head, keyPositions) =>
 export const getIsThereCollision = createSelector(
   [getHead, getSnakeKeyPositions],
   R.either(isHeadOutOfBounds, didHeadHitBody)
+);
+
+const getFoodGeneratorOffset = R.prop('foodGeneratorOffset');
+
+export const getFoodPosition = createSelectorTrackingArguments([0])(
+  [getFoodGeneratorOffset, getSnakeKeyPositions],
+  getFoodPosition$
 );
 
 export const getIsFoodEaten = createSelector(

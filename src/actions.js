@@ -13,7 +13,7 @@ export const UI = createTypes('UI', [
 ]);
 
 export const GAME = createTypes('GAME', [
-  'COLLISION', 'DIRECTION_CHANGED', 'FOOD_EATEN', 'NEW', 'TICK',
+  'COLLISION', 'DIRECTION_CHANGED', 'FOOD_EATEN', 'INIT', 'NEW', 'TICK',
 ]);
 
 // Action Creators
@@ -27,8 +27,8 @@ export const game = {
   onCollision: () => action(GAME.COLLISION),
   onDirectionChanged: (direction, moment) =>
     action(GAME.DIRECTION_CHANGED, { direction, moment }),
-  onFoodEaten: (foodPosition, moment) =>
-    action(GAME.FOOD_EATEN, { foodPosition, moment }),
-  onStartNewGame: foodPosition => action(GAME.NEW, { foodPosition }),
+  onInit: foodGeneratorSeed => action(GAME.INIT, { foodGeneratorSeed }),
+  onFoodEaten: () => action(GAME.FOOD_EATEN),
+  onStartNewGame: () => action(GAME.NEW),
   onTick: () => action(GAME.TICK),
 };

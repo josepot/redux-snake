@@ -1,6 +1,8 @@
+import hashFn from 'int32-fnv1a';
 import { ROWS, COLS } from '../config';
 
-const getRandomInt = (limit) => Math.floor(Math.random() * limit);
+const getPseudoRandomInt = (foodOffset, limit) =>
+  Math.abs(hashFn(foodOffset) % limit);
 
 const positionToIndex = (position) => (position.y * COLS) + position.x;
 const indexToPosition =
@@ -24,11 +26,11 @@ const getSnakePositionsIndexedSet = keyPositions => {
   return result;
 };
 
-export default snakeKeyPositions => {
+export default (foodOffset, snakeKeyPositions) => {
   const snakePositionsIndexedSet = getSnakePositionsIndexedSet(snakeKeyPositions);
   const nAvailablePositions = (ROWS * COLS) - snakePositionsIndexedSet.size;
 
-  let winner = getRandomInt(nAvailablePositions);
+  let winner = getPseudoRandomInt(foodOffset, nAvailablePositions);
   for (let i = 0; i <= winner; i++) {
     if (snakePositionsIndexedSet.has(i)) winner++;
   }
