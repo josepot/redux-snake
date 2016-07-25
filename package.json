@@ -15,6 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "immutable": "^3.8.0",
+    "int32-fnv1a": "^1.0.0",
     "ramda": "^0.21.0",
     "react": "^15.0.1",
     "react-dom": "^15.0.1",
