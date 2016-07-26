@@ -1,5 +1,3 @@
-/* eslint no-underscore-dangle:0 */
-
 import R from 'ramda';
 import { createStructuredSelector, createSelector } from 'reselect';
 
@@ -8,7 +6,8 @@ import {
   getGameDimensions,
   getViewBoxStr,
 } from './dimensions';
-import { getSnakeKeyPositions, getFoodPosition } from './snake';
+import { getSnakeKeyPositions } from './snake';
+import { getFoodPosition } from './food';
 
 export const getGameStatus = R.prop('gameStatus');
 
@@ -17,7 +16,7 @@ export default createStructuredSelector({
   foodProps: getFoodPosition,
   messagesProps: createSelector([getGameStatus], R.prop(R.__, MESSAGES)),
   snakeProps: createStructuredSelector({
-    points: createSelector(getSnakeKeyPositions, s => s.toArray()),
+    points: getSnakeKeyPositions,
   }),
   viewboxStr: getViewBoxStr,
 });

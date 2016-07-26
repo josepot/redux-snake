@@ -1,11 +1,12 @@
 import React, { PropTypes } from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 
 const color = '#3E462F';
 const Snake = ({ points }) => (
-  points.length === 1 ?
+  points.size === 1 ?
     <rect
-      x={points[0].x}
-      y={points[0].y}
+      x={points.get(0).x}
+      y={points.get(0).y}
       width={1}
       height={1}
       fill={color}
@@ -20,7 +21,7 @@ const Snake = ({ points }) => (
 );
 
 export const stateProps = {
-  points: PropTypes.arrayOf(PropTypes.shape({
+  points: ImmutablePropTypes.listOf(PropTypes.shape({
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired,
   })).isRequired,

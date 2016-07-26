@@ -5,10 +5,8 @@ import { call, select, put } from 'redux-saga/effects';
 import getNowInMs from '../utils/get-now-in-ms';
 import { GAME_STATUS } from '../constants';
 import { TICK_FREQUENCY } from '../config';
-import {
-  getIsFoodEaten,
-  getIsThereCollision,
-} from '../queries/snake';
+import { getIsThereCollision } from '../queries/snake';
+import { getIsFoodEaten } from '../queries/food';
 
 import { GAME, game } from '../actions';
 
