@@ -1,6 +1,10 @@
 {
-  "extends": "airbnb",
+  "env": {
+    "mocha": true,
+    "es6": true,
+  },
   "no-underscore-dangle": false,
+  "extends": "airbnb",
   "parserOptions":{
     "ecmaFeatures": {
       "experimentalObjectRestSpread": true

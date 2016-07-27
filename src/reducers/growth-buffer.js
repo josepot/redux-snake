@@ -14,9 +14,9 @@ const growthBufferReducer = (state = initialState, { type }) =>
   })(state);
 
 const undoOnCollisionEnhancer = (reducer) =>
-  ({ previous, current } = { previous: null, current: 0 }, { type }) => (
+  ({ previous, current } = {}, { type }) => (
     type === GAME.COLLISION ?
-      { previous: null, current: previous } :
+      { current: previous } :
       { previous: current, current: reducer(current, { type }) }
   );
 
