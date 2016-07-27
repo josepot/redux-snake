@@ -2,6 +2,9 @@
   "name": "react-redux-snake",
   "version": "0.0.0",
   "description": "The snake game done with React.js and Redux.js",
+  "engines": {
+    "node": "6.3.0"
+  },
   "scripts": {
     "start": "node server.js",
     "test": "./node_modules/mocha/bin/mocha --opts mocha.opts",
