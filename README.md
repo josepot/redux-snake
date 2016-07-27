@@ -15,3 +15,7 @@ A Redux-React implementation of the popular "Snake Game".
 - Press one of the arrow buttons to start playing
 - Press space to pause/resume
 - If you crash press space to start a new game
+
+# circle-ci
+
+Testing that it works
