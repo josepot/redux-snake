@@ -2,9 +2,7 @@ import R from 'ramda';
 import { createSelector } from 'reselect';
 
 import { ROWS, COLS, MARGIN } from '../config.js';
-import * as dimensionsFunctions from './result-functions/dimensions';
-
-const getDimensions = R.prop('dimensions');
+import { getDimensions } from './raw-selectors';
 
 const getViewBox = R.once(R.always({
   x: 0 - MARGIN.LEFT,
@@ -19,12 +17,25 @@ const getGameProportions = R.once(() => {
   return width / height;
 });
 
+export const gameDimensionsCombiner = (gameProportions, { width, height }) => {
+  const windowProportions = width / height;
+
+  return windowProportions > gameProportions ?
+  {
+    width: height * gameProportions,
+    height,
+  } : {
+    width,
+    height: width / gameProportions,
+  };
+};
+
 export const getViewBoxStr = createSelector(
   [getViewBox],
-  dimensionsFunctions.getViewBoxStr
+  ({ x, y, width, height }) => `${x} ${y} ${width} ${height}`
 );
 
 export const getGameDimensions = createSelector(
   [getGameProportions, getDimensions],
-  dimensionsFunctions.getGameDimensions
+  gameDimensionsCombiner
 );

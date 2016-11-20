@@ -1,9 +1,7 @@
 import React, { PropTypes } from 'react';
-import { compose, lifecycle, withHandlers } from 'recompose';
 import { connect } from 'react-redux';
 
-import storeConnector from '../queries/app';
-import { ui } from '../actions';
+import storeConnector from '../selectors/app';
 
 import Background from '../components/background';
 import Food from '../components/food';
@@ -29,7 +27,7 @@ const App = ({
   </svg>
 );
 
-const stateProps = {
+App.propTypes = {
   dimensions: PropTypes.shape({
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
@@ -40,36 +38,4 @@ const stateProps = {
   viewboxStr: PropTypes.string.isRequired,
 };
 
-const handlers = {
-  dimensionsUpdateDispatcher: PropTypes.func.isRequired,
-  keyPressedDispatcher: PropTypes.func.isRequired,
-};
-
-App.propTypes = {
-  ...stateProps,
-  ...handlers,
-};
-
-const enhancedApp = compose(
-  withHandlers({
-    onDimensionsUpdated: props => () =>
-      props.dimensionsUpdateDispatcher(window.innerWidth, window.innerHeight),
-    onKeyPressed: props => e =>
-      props.keyPressedDispatcher(e.keyCode || e.which),
-  }),
-  lifecycle({
-    componentDidMount() {
-      this.props.onDimensionsUpdated();
-      window.addEventListener('resize', this.props.onDimensionsUpdated);
-      document.addEventListener('keydown', this.props.onKeyPressed, true);
-    },
-  })
-)(App);
-
-export default connect(
-  storeConnector,
-  {
-    dimensionsUpdateDispatcher: ui.onWindowResized,
-    keyPressedDispatcher: ui.onKeyPressed,
-  }
-)(enhancedApp);
+export default connect(storeConnector)(App);
