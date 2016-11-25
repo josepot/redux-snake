@@ -4,8 +4,8 @@ import { SPACE_KEY_PRESSED, onStartNewGame } from '../actions';
 import { GAME_STATUS } from '../constants';
 
 function* startNewGame() {
-  const randomSeed = Math.floor(Math.random() * 1000);
-  const randomIncreasser = Math.floor(Math.random() * 10);
+  const randomSeed = Math.round(Math.random() * 1000);
+  const randomIncreasser = 1 + Math.round(Math.random() * 10);
   yield put(onStartNewGame(randomSeed, randomIncreasser));
 }
 
