@@ -1,4 +1,4 @@
-import { call, cancel, fork, select, take } from 'redux-saga/effects';
+import { call, cancel, race, select, take } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 
 import { TICK_FREQUENCY } from '../config';
@@ -7,7 +7,15 @@ import { DIRECTION_ENTERED, SPACE_KEY_PRESSED, TICK, onTick } from '../actions';
 import { getGameStatus } from '../selectors/raw-selectors';
 import dispatchActionsFromChannel from './helpers/dispatch-actions-from-channel';
 
+function* waitUntilGamesStatusEquals(...gameStatusTargets) {
+  do {
+    yield take([SPACE_KEY_PRESSED, DIRECTION_ENTERED, TICK]);
+  } while (!gameStatusTargets.includes(yield select(getGameStatus)));
+}
+
 function* startTicker() {
+  yield waitUntilGamesStatusEquals(GAME_STATUS.PLAYING);
+
   const timeChannel = eventChannel(emmit => {
     const tick = () => emmit(onTick());
     window.setTimeout(tick, 0);
@@ -19,17 +27,11 @@ function* startTicker() {
 }
 
 export default function* time() {
-  let tickerTask;
-  while (true) {
-    yield take([SPACE_KEY_PRESSED, DIRECTION_ENTERED, TICK]);
-    const gameStatus = yield select(getGameStatus);
-
-    if (gameStatus === GAME_STATUS.PLAYING) {
-      if (!tickerTask || !tickerTask.isRunning()) {
-        tickerTask = yield fork(startTicker);
-      }
-    } else if (tickerTask && tickerTask.isRunning()) {
-      yield cancel(tickerTask);
-    }
+  while (1) {
+    yield race({
+      startTicker: call(startTicker),
+      stopTicker: call(
+        waitUntilGamesStatusEquals, GAME_STATUS.PAUSED, GAME_STATUS.ENDED),
+    });
   }
 }
