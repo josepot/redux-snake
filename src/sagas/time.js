@@ -1,4 +1,4 @@
-import { call, cancel, race, select, take } from 'redux-saga/effects';
+import { call, race, select, take } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 
 import { TICK_FREQUENCY } from '../config';
@@ -14,7 +14,7 @@ function* waitUntilGamesStatusEquals(...gameStatusTargets) {
 }
 
 function* startTicker() {
-  yield waitUntilGamesStatusEquals(GAME_STATUS.PLAYING);
+  yield call(waitUntilGamesStatusEquals, GAME_STATUS.PLAYING);
 
   const timeChannel = eventChannel(emmit => {
     const tick = () => emmit(onTick());

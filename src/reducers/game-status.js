@@ -11,7 +11,7 @@ const gameStatusReducer = (state = GAME_STATUS.READY, { type }) => {
         [GAME_STATUS.ENDED]: GAME_STATUS.READY,
       }[state] || state;
     case DIRECTION_ENTERED:
-      return state === GAME_STATUS.READY ?
+      return [GAME_STATUS.READY, GAME_STATUS.PAUSED].includes(state) ?
         GAME_STATUS.PLAYING :
         state;
     default:
