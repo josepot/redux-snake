@@ -1,11 +1,9 @@
-import { take, put, cancelled } from 'redux-saga/effects';
+import { takeEvery } from 'redux-saga';
+import { put, cancelled } from 'redux-saga/effects';
 
 export default function* (channel) {
   try {
-    while (true) {
-      const action = yield take(channel);
-      yield put(action);
-    }
+    yield* takeEvery(channel, put);
   } finally {
     if (yield cancelled) channel.close();
   }
